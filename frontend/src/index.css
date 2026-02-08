@@ -352,3 +352,25 @@ input, textarea, select {
   color: var(--text-secondary);
   max-width: 65ch;
 }
+
+/* ──────────────────────────────────────────────
+   Scroll Reveal
+   ────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

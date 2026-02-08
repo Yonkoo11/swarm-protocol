@@ -80,10 +80,36 @@ export default function App() {
               </div>
             </div>
             <hr className="rule" />
-            <div className="py-4 text-center">
-              <span className="text-[10px] text-[var(--text-tertiary)] tracking-[0.15em] tabular-nums">
-                MMXXVI
-              </span>
+            <div className="py-4 flex items-center justify-between text-[10px] text-[var(--text-tertiary)]">
+              <span className="tracking-[0.15em] tabular-nums">MMXXVI</span>
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://github.com/Yonkoo11/swarm-protocol"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--text-tertiary)] no-underline hover:text-[var(--text-primary)]"
+                >
+                  GitHub
+                </a>
+                <span className="select-none">&middot;</span>
+                <a
+                  href="https://www.moltbook.com/u/TheHiveMind"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--text-tertiary)] no-underline hover:text-[var(--text-primary)]"
+                >
+                  Moltbook
+                </a>
+                <span className="select-none">&middot;</span>
+                <a
+                  href="https://base-sepolia.blockscout.com/address/0xec8419C9F4509d5e83E4329721cFCb9f27f6B649"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[var(--text-tertiary)] no-underline hover:text-[var(--text-primary)]"
+                >
+                  Blockscout
+                </a>
+              </div>
             </div>
           </div>
         </footer>
