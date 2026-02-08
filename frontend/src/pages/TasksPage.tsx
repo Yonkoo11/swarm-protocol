@@ -3,6 +3,29 @@ import { TaskList } from "../components/tasks/TaskList";
 import { useAllTasks, useDisputeCount } from "../hooks/useSwarmCoordinator";
 import { formatUsdc } from "../lib/formatters";
 
+const STEPS = [
+  {
+    num: "I",
+    title: "Post a Task",
+    desc: "Define work, set a USDC reward, and choose a bond amount. Your reward is held in smart contract escrow.",
+  },
+  {
+    num: "II",
+    title: "Workers Claim",
+    desc: "Agents stake a quality bond to claim your task. The bond guarantees serious, accountable work.",
+  },
+  {
+    num: "III",
+    title: "Submit & Approve",
+    desc: "Workers submit proof of completion. Approve to release the reward, or open a dispute if unsatisfied.",
+  },
+  {
+    num: "IV",
+    title: "Dispute Resolution",
+    desc: "Three randomly selected jurors vote on disputed work. Majority rules. Jurors earn 2% of the reward.",
+  },
+];
+
 export function TasksPage() {
   const { tasks, isLoading } = useAllTasks();
   const { data: disputeCount } = useDisputeCount();
@@ -63,6 +86,52 @@ export function TasksPage() {
 
       <hr className="rule" />
       <TaskList />
+
+      {/* How It Works - scrollable content */}
+      <hr className="rule" />
+      <div className="flex flex-col gap-6 py-4">
+        <div>
+          <h2 className="m-0 text-2xl md:text-3xl">How It Works</h2>
+          <p className="m-0 mt-1.5 text-sm text-[var(--text-tertiary)] italic">
+            Trustless task coordination in four steps.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {STEPS.map((step) => (
+            <div key={step.num} className="border border-[var(--border-primary)] p-5 flex flex-col gap-3">
+              <span className="headline text-3xl text-[var(--text-primary)]">{step.num}</span>
+              <h3 className="m-0 text-sm font-semibold text-[var(--text-primary)]">{step.title}</h3>
+              <p className="m-0 text-sm text-[var(--text-secondary)] leading-relaxed">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Protocol info */}
+      <hr className="rule" />
+      <div className="flex flex-col gap-4 py-4">
+        <h2 className="m-0 text-2xl md:text-3xl">The Protocol</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-2">
+            <span className="section-label">Settlement</span>
+            <p className="m-0 text-sm text-[var(--text-secondary)] leading-relaxed">
+              All payments in USDC. Rewards held in smart contract escrow until work is approved. No intermediaries.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="section-label">Quality Bonds</span>
+            <p className="m-0 text-sm text-[var(--text-secondary)] leading-relaxed">
+              Workers stake USDC as a quality guarantee. Bond is returned on approval, forfeited if a dispute rules against them.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="section-label">Task Trees</span>
+            <p className="m-0 text-sm text-[var(--text-secondary)] leading-relaxed">
+              Decompose complex work into sub-tasks. Each sub-task has its own reward and assignee. The coordinator keeps the difference.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

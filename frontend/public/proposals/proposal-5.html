@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMind - The Ink</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Noto+Serif+JP:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif; font-weight: 300; font-size: 15px;
+      line-height: 1.7; color: #1C1917; background-color: #F7F3ED;
+      background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 { font-family: 'Cormorant Garamond', 'Noto Serif JP', serif; font-weight: 400; letter-spacing: 0.01em; }
+    h1 { font-size: 2.4rem; font-weight: 300; }
+    h2 { font-size: 1.6rem; font-weight: 400; margin-bottom: 1.5rem; }
+    h3 { font-size: 1.2rem; font-weight: 500; }
+    .serif-num { font-family: 'Cormorant Garamond', serif; font-weight: 300; }
+
+    /* Brush stroke divider */
+    .brush-stroke {
+      height: 3px; border-radius: 2px; opacity: 0.15; margin: 0 auto;
+      background: linear-gradient(90deg, transparent 0%, #1C1917 8%, #1C1917 15%, #2a2520 30%, #1C1917 50%, #2a2520 70%, #1C1917 85%, #1C1917 92%, transparent 100%);
+      -webkit-mask: linear-gradient(90deg, transparent 0%, black 5%, black 12%, black 50%, black 88%, black 95%, transparent 100%);
+      mask: linear-gradient(90deg, transparent 0%, black 5%, black 12%, black 50%, black 88%, black 95%, transparent 100%);
+    }
+    .brush-stroke.thin { height: 1.5px; opacity: 0.1; max-width: 60%; }
+
+    /* Layout */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 4rem 0; }
+
+    /* Red seal / chop mark */
+    .seal {
+      width: 42px; height: 42px; border: 2px solid #D94F3B; border-radius: 4px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif; font-size: 16px; font-weight: 500;
+      color: #D94F3B; transform: rotate(-3deg); flex-shrink: 0; position: relative;
+    }
+    .seal::after {
+      content: ''; position: absolute; inset: -1px;
+      border: 1px solid rgba(217, 79, 59, 0.2); border-radius: 5px;
+    }
+
+    /* Header */
+    header { padding: 2rem 0; }
+    header .container { display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; gap: 1rem; }
+    .logo h1 { font-size: 1.6rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    nav { display: flex; gap: 2.5rem; align-items: center; }
+    nav a {
+      color: #1C1917; text-decoration: none; font-size: 13px; font-weight: 400;
+      letter-spacing: 0.04em; text-transform: uppercase; padding-bottom: 4px; position: relative;
+    }
+    nav a.active::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2.5px;
+      background: linear-gradient(90deg, transparent, #1C1917 20%, #1C1917 80%, transparent);
+      border-radius: 2px; opacity: 0.7;
+    }
+    nav a:hover { opacity: 0.6; }
+    .btn-wallet {
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400;
+      letter-spacing: 0.05em; text-transform: uppercase; padding: 0.6rem 1.6rem;
+      border: 1px solid #1C1917; background: transparent; color: #1C1917;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .btn-wallet:hover { background: #1C1917; color: #F7F3ED; }
+
+    /* Vertical decorative text */
+    .vertical-label {
+      position: fixed; left: 1.5rem; top: 50%;
+      transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl;
+      font-family: 'Noto Serif JP', serif; font-size: 11px; font-weight: 200;
+      letter-spacing: 0.3em; color: rgba(28, 25, 23, 0.08); pointer-events: none;
+    }
+
+    /* Stats */
+    .stats { display: flex; justify-content: center; gap: 6rem; padding: 3rem 0; }
+    .stat { text-align: center; }
+    .stat-value { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 300; line-height: 1.2; }
+    .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; opacity: 0.4; margin-top: 0.3rem; }
+
+    /* Task list */
+    .task-item { padding: 2rem 0; display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: start; }
+    .task-item + .task-item { border-top: 1px solid rgba(28, 25, 23, 0.06); }
+    .task-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 500; margin-bottom: 0.4rem; }
+    .task-meta { font-size: 12px; opacity: 0.45; letter-spacing: 0.02em; }
+    .task-meta span + span::before { content: '\00b7'; margin: 0 0.6rem; opacity: 0.5; }
+    .task-reward { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 400; white-space: nowrap; text-align: right; }
+    .task-reward small { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 300; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.4; display: block; }
+
+    /* Status dots */
+    .status { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 400; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .status-open .status-dot { background: #4A7C59; }
+    .status-claimed .status-dot { background: #8B7355; }
+    .status-review .status-dot { background: #D94F3B; }
+    .status-complete .status-dot { background: #1C1917; }
+
+    /* Task detail */
+    .task-detail { padding: 3rem 0; max-width: 720px; }
+    .task-detail h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .detail-grid { display: grid; grid-template-columns: 120px 1fr; gap: 0.8rem 2rem; margin: 2rem 0; font-size: 14px; }
+    .detail-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; padding-top: 2px; }
+    .detail-value { line-height: 1.6; }
+    .task-description { margin: 2.5rem 0; line-height: 1.9; max-width: 600px; }
+
+    /* Buttons */
+    .btn-primary, .btn-outline, .btn-accent {
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400;
+      letter-spacing: 0.06em; text-transform: uppercase; padding: 0.75rem 2.5rem;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .btn-primary { background: #1C1917; color: #F7F3ED; border: 1px solid #1C1917; }
+    .btn-primary:hover { opacity: 0.8; }
+    .btn-outline { background: transparent; color: #1C1917; border: 1px solid rgba(28, 25, 23, 0.2); }
+    .btn-outline:hover { border-color: #1C1917; }
+    .btn-accent { background: transparent; color: #D94F3B; border: 1px solid #D94F3B; }
+    .btn-accent:hover { background: #D94F3B; color: #F7F3ED; }
+    .actions { display: flex; gap: 1rem; margin-top: 2rem; }
+
+    /* Create task form */
+    .form-group { margin-bottom: 2rem; }
+    .form-group label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.4; margin-bottom: 0.6rem; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; max-width: 520px; font-family: 'Inter', sans-serif; font-size: 14px;
+      font-weight: 300; padding: 0.8rem 0; border: none;
+      border-bottom: 1px solid rgba(28, 25, 23, 0.12); background: transparent;
+      color: #1C1917; outline: none; transition: border-color 0.3s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-bottom-color: #1C1917; }
+    .form-group textarea { resize: vertical; min-height: 100px; line-height: 1.7; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 520px; }
+
+    /* Dispute */
+    .dispute-card { padding: 2.5rem 0; max-width: 720px; }
+    .dispute-parties { display: flex; align-items: center; gap: 2rem; margin: 1.5rem 0; font-size: 13px; }
+    .dispute-vs { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-style: italic; opacity: 0.3; }
+    .dispute-party { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; opacity: 0.6; }
+    .vote-bar { display: flex; height: 3px; border-radius: 2px; overflow: hidden; margin: 1.5rem 0 0.5rem; max-width: 400px; }
+    .vote-bar .poster { background: #1C1917; }
+    .vote-bar .worker { background: rgba(28, 25, 23, 0.15); }
+    .vote-labels { display: flex; justify-content: space-between; max-width: 400px; font-size: 11px; opacity: 0.4; }
+
+    /* Footer */
+    footer { padding: 3rem 0; text-align: center; font-size: 12px; opacity: 0.25; letter-spacing: 0.04em; }
+    footer span + span::before { content: '\00b7'; margin: 0 1rem; }
+
+    /* Section label */
+    .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.3; margin-bottom: 2.5rem; }
+  </style>
+</head>
+<body>
+
+  <div class="vertical-label">HiveMind Protocol / Base Network / Decentralized Task Marketplace</div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="logo">
+        <div class="seal">蜂</div>
+        <h1>HiveMind</h1>
+      </div>
+      <nav>
+        <a href="#" class="active">Marketplace</a>
+        <a href="#">My Tasks</a>
+        <a href="#">Disputes</a>
+        <a href="#">Govern</a>
+        <button class="btn-wallet">0x7a2...f41e</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container"><div class="brush-stroke"></div></div>
+
+  <!-- Stats -->
+  <section>
+    <div class="container">
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">1,247</div>
+          <div class="stat-label">Tasks Posted</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">$482k</div>
+          <div class="stat-label">Rewards Paid</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">892</div>
+          <div class="stat-label">Active Workers</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">97.3%</div>
+          <div class="stat-label">Resolution Rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="brush-stroke thin"></div></div>
+
+  <!-- Task List -->
+  <section>
+    <div class="container">
+      <div class="section-label">Open Marketplace</div>
+
+      <div class="task-item">
+        <div>
+          <div class="task-title">Smart Contract Audit for ERC-4626 Vault</div>
+          <div class="task-meta">
+            <span class="status status-open"><span class="status-dot"></span> Open</span>
+            <span>3 applicants</span>
+            <span>Posted 2h ago</span>
+          </div>
+        </div>
+        <div class="task-reward">2,500 <small>USDC</small></div>
+      </div>
+
+      <div class="task-item">
+        <div>
+          <div class="task-title">Design System for DeFi Dashboard</div>
+          <div class="task-meta">
+            <span class="status status-claimed"><span class="status-dot"></span> Claimed</span>
+            <span>Worker bonded 200 USDC</span>
+            <span>Due in 5 days</span>
+          </div>
+        </div>
+        <div class="task-reward">1,800 <small>USDC</small></div>
+      </div>
+
+      <div class="task-item">
+        <div>
+          <div class="task-title">Subgraph Indexer for NFT Marketplace Events</div>
+          <div class="task-meta">
+            <span class="status status-open"><span class="status-dot"></span> Open</span>
+            <span>7 applicants</span>
+            <span>Posted 6h ago</span>
+          </div>
+        </div>
+        <div class="task-reward">900 <small>USDC</small></div>
+      </div>
+
+      <div class="task-item">
+        <div>
+          <div class="task-title">Technical Whitepaper Review and Editing</div>
+          <div class="task-meta">
+            <span class="status status-review"><span class="status-dot"></span> In Review</span>
+            <span>Submitted for approval</span>
+            <span>3 days elapsed</span>
+          </div>
+        </div>
+        <div class="task-reward">600 <small>USDC</small></div>
+      </div>
+
+      <div class="task-item">
+        <div>
+          <div class="task-title">Migrate Python Backend to Rust</div>
+          <div class="task-meta">
+            <span class="status status-complete"><span class="status-dot"></span> Complete</span>
+            <span>Paid out</span>
+            <span>Finished 1d ago</span>
+          </div>
+        </div>
+        <div class="task-reward">4,200 <small>USDC</small></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="brush-stroke"></div></div>
+
+  <!-- Task Detail -->
+  <section>
+    <div class="container">
+      <div class="section-label">Task Detail</div>
+      <div class="task-detail">
+        <h2>Smart Contract Audit for ERC-4626 Vault</h2>
+        <div class="status status-open" style="margin-top: 0.5rem;">
+          <span class="status-dot"></span> Open for claims
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-label">Reward</div>
+          <div class="detail-value"><span class="serif-num" style="font-size: 1.3rem;">2,500</span> USDC</div>
+          <div class="detail-label">Bond Required</div>
+          <div class="detail-value"><span class="serif-num" style="font-size: 1.3rem;">250</span> USDC (10%)</div>
+          <div class="detail-label">Deadline</div>
+          <div class="detail-value">February 22, 2026</div>
+          <div class="detail-label">Posted By</div>
+          <div class="detail-value" style="font-family: 'SF Mono', monospace; font-size: 13px; opacity: 0.6;">0x7a2E...f41e</div>
+          <div class="detail-label">Category</div>
+          <div class="detail-value">Security / Audit</div>
+          <div class="detail-label">Reputation</div>
+          <div class="detail-value">Min. 4 completed tasks</div>
+        </div>
+
+        <div class="task-description">
+          <p>We need a thorough security review of our ERC-4626 tokenized vault implementation on Base. The vault handles deposits, withdrawals, and yield distribution for a lending protocol. Scope includes the core vault contract (~400 LOC), the strategy adapter, and the fee module.</p>
+          <p style="margin-top: 1rem;">Deliverables: written report with severity classifications, proof-of-concept for any critical or high findings, and recommended fixes. Familiarity with OpenZeppelin's ERC-4626 reference and common vault attack vectors (inflation attack, rounding exploits) is expected.</p>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary">Claim Task &amp; Stake Bond</button>
+          <button class="btn-outline">Contact Poster</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="brush-stroke thin"></div></div>
+
+  <!-- Create Task -->
+  <section>
+    <div class="container">
+      <div class="section-label">Post a Task</div>
+      <form style="max-width: 560px;">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" placeholder="A clear, specific title for your task">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea placeholder="Describe the work, deliverables, and any requirements"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Reward (USDC)</label>
+            <input type="number" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label>Bond Percentage</label>
+            <select>
+              <option>5%</option>
+              <option selected>10%</option>
+              <option>15%</option>
+              <option>20%</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Deadline</label>
+            <input type="date">
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select>
+              <option>Development</option>
+              <option>Security / Audit</option>
+              <option>Design</option>
+              <option>Writing</option>
+              <option>Data / Analytics</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Minimum Reputation</label>
+          <input type="number" placeholder="0" style="max-width: 200px;">
+        </div>
+        <div class="actions" style="margin-top: 1rem;">
+          <button type="button" class="btn-primary">Post Task</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <div class="container"><div class="brush-stroke"></div></div>
+
+  <!-- Dispute -->
+  <section>
+    <div class="container">
+      <div class="section-label">Active Dispute</div>
+      <div class="dispute-card">
+        <h2>Dispute #38</h2>
+        <h3 style="font-weight: 400; opacity: 0.6; margin-top: 0.3rem;">Design System for DeFi Dashboard</h3>
+
+        <div class="dispute-parties">
+          <div>
+            <div class="detail-label" style="margin-bottom: 0.3rem;">Poster</div>
+            <div class="dispute-party">0x3bF1...a92c</div>
+          </div>
+          <div class="dispute-vs">vs.</div>
+          <div>
+            <div class="detail-label" style="margin-bottom: 0.3rem;">Worker</div>
+            <div class="dispute-party">0xd4E7...18fb</div>
+          </div>
+        </div>
+
+        <div class="detail-grid" style="margin: 2rem 0;">
+          <div class="detail-label">Reason</div>
+          <div class="detail-value">Deliverables incomplete. Design tokens and component library were specified but only static mockups were provided.</div>
+          <div class="detail-label">At Stake</div>
+          <div class="detail-value"><span class="serif-num" style="font-size: 1.1rem;">1,800</span> USDC reward + <span class="serif-num" style="font-size: 1.1rem;">180</span> USDC bond</div>
+          <div class="detail-label">Jurors</div>
+          <div class="detail-value">5 of 7 have voted</div>
+          <div class="detail-label">Time Left</div>
+          <div class="detail-value">18 hours</div>
+        </div>
+
+        <div style="margin: 2rem 0;">
+          <div class="detail-label" style="margin-bottom: 1rem;">Jury Consensus</div>
+          <div class="vote-bar">
+            <div class="poster" style="width: 60%;"></div>
+            <div class="worker" style="width: 40%;"></div>
+          </div>
+          <div class="vote-labels">
+            <span>Poster (3)</span>
+            <span>Worker (2)</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-accent">Cast Vote as Juror</button>
+          <button class="btn-outline">View Evidence</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container"><div class="brush-stroke thin"></div></div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <span>HiveMind Protocol</span>
+      <span>Base Network</span>
+      <span>v1.0</span>
+    </div>
+  </footer>
+
+</body>
+</html>

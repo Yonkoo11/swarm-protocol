@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HiveMind - Proposal 6: The Neon</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0D0D1A;
+    --bg-card: rgba(16, 16, 32, 0.7);
+    --text: #E8E8F0;
+    --text-dim: #8888A0;
+    --cyan: #00F0FF;
+    --magenta: #FF2D7B;
+    --green: #39FF14;
+    --yellow: #FFD600;
+    --orange: #FF6B2D;
+    --border: rgba(0, 240, 255, 0.15);
+    --glow-cyan: 0 0 12px rgba(0, 240, 255, 0.4);
+    --glow-magenta: 0 0 12px rgba(255, 45, 123, 0.4);
+    --glow-green: 0 0 12px rgba(57, 255, 20, 0.4);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Ambient glow spots */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 600px 400px at 15% 20%, rgba(0, 240, 255, 0.04), transparent),
+      radial-gradient(ellipse 500px 500px at 80% 60%, rgba(255, 45, 123, 0.03), transparent),
+      radial-gradient(ellipse 400px 300px at 50% 90%, rgba(57, 255, 20, 0.02), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* --- HEADER --- */
+  header {
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--magenta), transparent);
+    animation: headerGlow 6s ease-in-out infinite;
+  }
+
+  @keyframes headerGlow {
+    0%, 100% { opacity: 0.6; filter: hue-rotate(0deg); }
+    50% { opacity: 1; filter: hue-rotate(40deg); }
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+  }
+
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan), 0 0 40px rgba(0, 240, 255, 0.2);
+  }
+
+  .logo span { color: var(--magenta); text-shadow: var(--glow-magenta); }
+
+  nav { display: flex; gap: 32px; }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 0;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s;
+  }
+
+  nav a:hover, nav a.active {
+    color: var(--cyan);
+    border-bottom-color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+
+  .btn-connect {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: var(--glow-cyan);
+  }
+
+  .btn-connect:hover {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 45, 123, 0.1));
+    box-shadow: var(--glow-cyan), 0 0 24px rgba(0, 240, 255, 0.2);
+  }
+
+  /* Live stats bar */
+  .live-bar {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    box-shadow: var(--glow-green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .live-bar .val { color: var(--cyan); font-weight: 600; }
+
+  /* --- SECTION TITLES --- */
+  .section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 40px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::before {
+    content: '//';
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan);
+  }
+
+  /* --- GLASS CARD --- */
+  .card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px;
+    position: relative;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .card:hover {
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.06);
+  }
+
+  /* Corner brackets */
+  .card::before, .card::after {
+    content: '';
+    position: absolute;
+    width: 12px; height: 12px;
+    border-color: rgba(0, 240, 255, 0.3);
+    border-style: solid;
+  }
+
+  .card::before {
+    top: -1px; left: -1px;
+    border-width: 1px 0 0 1px;
+    border-radius: 6px 0 0 0;
+  }
+
+  .card::after {
+    bottom: -1px; right: -1px;
+    border-width: 0 1px 1px 0;
+    border-radius: 0 0 6px 0;
+  }
+
+  /* --- STATS DASHBOARD --- */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 28px 16px;
+  }
+
+  .stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--cyan);
+    text-shadow: var(--glow-cyan), 0 0 40px rgba(0, 240, 255, 0.15);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-value.magenta { color: var(--magenta); text-shadow: var(--glow-magenta); }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* --- STATUS BADGES --- */
+  .badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .badge-open {
+    color: var(--green);
+    border: 1px solid rgba(57, 255, 20, 0.4);
+    box-shadow: var(--glow-green);
+  }
+
+  .badge-progress {
+    color: var(--cyan);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .badge-review {
+    color: var(--yellow);
+    border: 1px solid rgba(255, 214, 0, 0.4);
+    box-shadow: 0 0 12px rgba(255, 214, 0, 0.3);
+  }
+
+  .badge-disputed {
+    color: var(--magenta);
+    border: 1px solid rgba(255, 45, 123, 0.4);
+    box-shadow: var(--glow-magenta);
+  }
+
+  .badge-complete {
+    color: var(--text-dim);
+    border: 1px solid rgba(136, 136, 160, 0.3);
+  }
+
+  /* --- TASK LIST --- */
+  .task-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .task-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .task-meta {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .task-reward {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--magenta);
+    text-shadow: var(--glow-magenta);
+    white-space: nowrap;
+  }
+
+  .task-deadline {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  /* --- EXPANDED TASK DETAIL --- */
+  .task-detail {
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 24px rgba(0, 240, 255, 0.08);
+  }
+
+  .task-detail .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .task-detail h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .detail-field label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .detail-field .value {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .detail-field .value.cyan { color: var(--cyan); }
+  .detail-field .value.magenta { color: var(--magenta); text-shadow: var(--glow-magenta); }
+
+  .detail-description {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    border-left: 2px solid var(--cyan);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+  }
+
+  .detail-actions { display: flex; gap: 12px; }
+
+  .btn {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid;
+  }
+
+  .btn-primary {
+    background: transparent;
+    color: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 240, 255, 0.05));
+    box-shadow: var(--glow-cyan), 0 0 30px rgba(0, 240, 255, 0.15);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-dim);
+    border-color: rgba(136, 136, 160, 0.3);
+  }
+
+  .btn-secondary:hover {
+    color: var(--text);
+    border-color: rgba(136, 136, 160, 0.5);
+  }
+
+  /* --- CREATE TASK FORM --- */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group { margin-bottom: 0; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    outline: none;
+  }
+
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+  }
+
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  .form-group select option { background: var(--bg); }
+
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .form-footer .estimate {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  .form-footer .estimate span {
+    color: var(--magenta);
+    font-weight: 600;
+  }
+
+  /* --- DISPUTE SECTION --- */
+  .dispute-card {
+    border-color: rgba(255, 45, 123, 0.25);
+  }
+
+  .dispute-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .dispute-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .vote-bars { margin-bottom: 20px; }
+
+  .vote-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .vote-label {
+    width: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .vote-label.approve { color: var(--green); }
+  .vote-label.reject { color: var(--magenta); }
+  .vote-label.abstain { color: var(--text-dim); }
+
+  .vote-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .vote-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+
+  .vote-fill.approve-fill {
+    background: var(--green);
+    box-shadow: var(--glow-green);
+    width: 58%;
+  }
+
+  .vote-fill.reject-fill {
+    background: var(--magenta);
+    box-shadow: var(--glow-magenta);
+    width: 28%;
+  }
+
+  .vote-fill.abstain-fill {
+    background: var(--text-dim);
+    width: 14%;
+  }
+
+  .vote-count {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    width: 40px;
+    text-align: right;
+  }
+
+  .juror-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .juror {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  .juror.voted-yes { border: 1px solid var(--green); color: var(--green); box-shadow: var(--glow-green); }
+  .juror.voted-no { border: 1px solid var(--magenta); color: var(--magenta); box-shadow: var(--glow-magenta); }
+  .juror.pending { border: 1px solid var(--text-dim); color: var(--text-dim); opacity: 0.5; }
+
+  .dispute-meta {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    display: flex;
+    gap: 24px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .dispute-meta span.val { color: var(--cyan); font-weight: 600; }
+
+  /* --- FOOTER --- */
+  footer {
+    margin-top: 60px;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  footer .contract {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    color: rgba(0, 240, 255, 0.5);
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  footer .network {
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  footer .network-dot {
+    width: 5px; height: 5px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: var(--glow-green);
+  }
+
+  /* Utility */
+  .mb-0 { margin-bottom: 0; }
+  .mt-sm { margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">HIVE<span>MIND</span></div>
+      <nav>
+        <a href="#" class="active">Tasks</a>
+        <a href="#">My Work</a>
+        <a href="#">Disputes</a>
+        <a href="#">Stake</a>
+      </nav>
+      <button class="btn-connect">Connect Wallet</button>
+    </div>
+    <div class="live-bar">
+      <span><span class="live-dot"></span>Base Mainnet</span>
+      <span>Block <span class="val">18,492,037</span></span>
+      <span>Gas <span class="val">0.002 gwei</span></span>
+      <span>TVL <span class="val">$2.4M</span></span>
+      <span>Active Workers <span class="val">847</span></span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- STATS DASHBOARD -->
+  <div class="section-title">Protocol Overview</div>
+  <div class="stats-grid">
+    <div class="card stat-card">
+      <div class="stat-value">1,247</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value magenta">$482K</div>
+      <div class="stat-label">Rewards Paid</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value">94.2%</div>
+      <div class="stat-label">Completion Rate</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value">23</div>
+      <div class="stat-label">Open Disputes</div>
+    </div>
+  </div>
+
+  <!-- TASK LIST -->
+  <div class="section-title">Open Tasks</div>
+  <div class="task-list">
+
+    <div class="card">
+      <div class="task-row">
+        <div>
+          <div class="task-title">Smart Contract Audit - ERC-4626 Vault</div>
+          <div class="task-meta">Posted by 0x7a3F...c912 &middot; 3 applicants &middot; Solidity</div>
+        </div>
+        <span class="badge badge-open">Open</span>
+        <span class="task-reward">2,500 USDC</span>
+        <span class="task-deadline">5d 12h left</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="task-row">
+        <div>
+          <div class="task-title">Subgraph Indexer for Lending Protocol Events</div>
+          <div class="task-meta">Posted by 0xBe21...a8f4 &middot; 1 applicant &middot; TypeScript, GraphQL</div>
+        </div>
+        <span class="badge badge-progress">In Progress</span>
+        <span class="task-reward">800 USDC</span>
+        <span class="task-deadline">2d 6h left</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="task-row">
+        <div>
+          <div class="task-title">Frontend Integration - Wallet Connect v3</div>
+          <div class="task-meta">Posted by 0x41dC...0b77 &middot; 7 applicants &middot; React, wagmi</div>
+        </div>
+        <span class="badge badge-open">Open</span>
+        <span class="task-reward">1,200 USDC</span>
+        <span class="task-deadline">8d 0h left</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="task-row">
+        <div>
+          <div class="task-title">Security Monitoring Bot - Forta Agent</div>
+          <div class="task-meta">Posted by 0xf093...dE61 &middot; 2 applicants &middot; Python</div>
+        </div>
+        <span class="badge badge-review">In Review</span>
+        <span class="task-reward">1,800 USDC</span>
+        <span class="task-deadline">Review period</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="task-row">
+        <div>
+          <div class="task-title">Documentation - Protocol Whitepaper v2</div>
+          <div class="task-meta">Posted by 0x2cAa...7f33 &middot; 0 applicants &middot; Technical Writing</div>
+        </div>
+        <span class="badge badge-open">Open</span>
+        <span class="task-reward">600 USDC</span>
+        <span class="task-deadline">14d 0h left</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EXPANDED TASK DETAIL -->
+  <div class="section-title">Task Detail</div>
+  <div class="card task-detail">
+    <div class="detail-header">
+      <div>
+        <h3>Smart Contract Audit - ERC-4626 Vault</h3>
+        <div class="task-meta mt-sm">Task #1084 &middot; Created Feb 3, 2026 &middot; Category: Security</div>
+      </div>
+      <span class="badge badge-open">Open</span>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-field">
+        <label>Reward</label>
+        <div class="value magenta">2,500 USDC</div>
+      </div>
+      <div class="detail-field">
+        <label>Required Bond</label>
+        <div class="value cyan">250 USDC (10%)</div>
+      </div>
+      <div class="detail-field">
+        <label>Poster</label>
+        <div class="value">0x7a3F...c912</div>
+      </div>
+      <div class="detail-field">
+        <label>Deadline</label>
+        <div class="value">Feb 8, 2026 - 14:00 UTC</div>
+      </div>
+      <div class="detail-field">
+        <label>Dispute Window</label>
+        <div class="value">48 hours after submission</div>
+      </div>
+      <div class="detail-field">
+        <label>Required Reputation</label>
+        <div class="value cyan">&ge; 85 / 100</div>
+      </div>
+    </div>
+
+    <div class="detail-description">
+      Perform a security audit of our ERC-4626 tokenized vault implementation (~400 LOC Solidity).
+      Scope includes deposit/withdraw flows, share calculation rounding, fee-on-transfer token handling,
+      and integration with our yield strategy contract. Deliverable: written report with severity ratings
+      (Critical/High/Medium/Low/Informational) and recommended fixes. Must include at least one
+      Foundry-based PoC for any High+ finding.
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn btn-primary">Claim Task &middot; Stake 250 USDC</button>
+      <button class="btn btn-secondary">View Contract</button>
+    </div>
+  </div>
+
+  <!-- CREATE TASK FORM -->
+  <div class="section-title">Post a Task</div>
+  <div class="card">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Task Title</label>
+        <input type="text" placeholder="e.g., Smart Contract Audit - Token Vesting">
+      </div>
+      <div class="form-group">
+        <label>Reward (USDC)</label>
+        <input type="number" placeholder="1000">
+      </div>
+      <div class="form-group">
+        <label>Bond Percentage</label>
+        <select>
+          <option>5%</option>
+          <option selected>10%</option>
+          <option>15%</option>
+          <option>20%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Deadline</label>
+        <input type="date">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select>
+          <option>Smart Contract Development</option>
+          <option>Security Audit</option>
+          <option>Frontend</option>
+          <option>Backend / Indexing</option>
+          <option>Documentation</option>
+          <option>Design</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Description</label>
+        <textarea placeholder="Detailed requirements, deliverables, and acceptance criteria..."></textarea>
+      </div>
+    </div>
+    <div class="form-footer">
+      <div class="estimate">Total cost: reward + <span>2.5% protocol fee</span> = <span>1,025 USDC</span></div>
+      <button class="btn btn-primary">Create Task</button>
+    </div>
+  </div>
+
+  <!-- DISPUTE SECTION -->
+  <div class="section-title">Active Dispute</div>
+  <div class="card dispute-card">
+    <div class="dispute-header">
+      <div>
+        <h3>Dispute #47 &mdash; Task #1061: Oracle Integration</h3>
+        <div class="task-meta mt-sm">Filed by poster 0xBe21...a8f4 &middot; Reason: Incomplete deliverable</div>
+      </div>
+      <span class="badge badge-disputed">Voting</span>
+    </div>
+
+    <div class="vote-bars">
+      <div class="vote-row">
+        <span class="vote-label approve">Approve</span>
+        <div class="vote-track"><div class="vote-fill approve-fill"></div></div>
+        <span class="vote-count">7</span>
+      </div>
+      <div class="vote-row">
+        <span class="vote-label reject">Reject</span>
+        <div class="vote-track"><div class="vote-fill reject-fill"></div></div>
+        <span class="vote-count">3</span>
+      </div>
+      <div class="vote-row">
+        <span class="vote-label abstain">Abstain</span>
+        <div class="vote-track"><div class="vote-fill abstain-fill"></div></div>
+        <span class="vote-count">2</span>
+      </div>
+    </div>
+
+    <div class="juror-grid">
+      <div class="juror voted-yes">J1</div>
+      <div class="juror voted-yes">J2</div>
+      <div class="juror voted-no">J3</div>
+      <div class="juror voted-yes">J4</div>
+      <div class="juror voted-yes">J5</div>
+      <div class="juror voted-no">J6</div>
+      <div class="juror voted-yes">J7</div>
+      <div class="juror voted-yes">J8</div>
+      <div class="juror voted-no">J9</div>
+      <div class="juror voted-yes">J10</div>
+      <div class="juror pending">J11</div>
+      <div class="juror pending">J12</div>
+    </div>
+
+    <div class="dispute-meta">
+      <span>Jurors seated: <span class="val">12</span></span>
+      <span>Votes cast: <span class="val">10 / 12</span></span>
+      <span>Stake at risk: <span class="val">180 USDC</span></span>
+      <span>Voting ends: <span class="val">6h 42m</span></span>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div>HiveMind Protocol &middot; Decentralized Task Marketplace &middot; Built on Base</div>
+    <div class="contract">0x8F3a...cD47 &middot; Verified on BaseScan</div>
+    <div class="network">
+      <span class="network-dot"></span>
+      Base Mainnet &middot; Chain ID 8453
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
