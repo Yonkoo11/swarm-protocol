@@ -52,7 +52,7 @@ export function CreateTaskForm() {
 
   if (!address) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-12 text-center">
+      <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -116,7 +116,7 @@ export function CreateTaskForm() {
       </div>
 
       {balance !== undefined && (
-        <div className="flex items-center gap-3 rounded-[var(--radius-sm)] bg-[var(--bg-tertiary)] px-3 py-2 text-xs">
+        <div className="flex items-center gap-3 bg-[var(--bg-tertiary)] px-3 py-2 text-xs">
           <span className="text-[var(--text-tertiary)]">Balance:</span>
           <span className="tabular-nums font-mono text-[var(--text-secondary)]">{formatUsdc(balance)} USDC</span>
           {allowance !== undefined && (

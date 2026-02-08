@@ -43,7 +43,7 @@ export function Header() {
 
       {/* Nav + Stats + Wallet row */}
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-3">
-        <div className="flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center justify-between gap-3">
           {/* Nav links */}
           <nav className="flex items-center gap-1 flex-wrap">
             {navLinks.map((link) => (
@@ -51,7 +51,7 @@ export function Header() {
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `btn-press px-3 py-1.5 text-[13px] font-medium no-underline border-b-2 ${
+                  `btn-press px-2 sm:px-3 py-1.5 text-[12px] sm:text-[13px] font-medium no-underline border-b-2 ${
                     isActive
                       ? "border-[var(--text-primary)] text-[var(--text-primary)]"
                       : "border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-primary)]"
@@ -64,14 +64,14 @@ export function Header() {
           </nav>
 
           {/* Right side: stats + wallet */}
-          <div className="flex items-center gap-5">
-            <div className="hidden sm:flex items-center gap-4 text-[12px] text-[var(--text-tertiary)]">
+          <div className="flex items-center gap-5 shrink-0">
+            <div className="hidden md:flex items-center gap-4 text-[12px] text-[var(--text-tertiary)]">
               <span>
-                <span className="font-medium tabular-nums text-[var(--text-secondary)]">{taskCount != null ? String(taskCount) : "-"}</span> tasks
+                <span className="font-medium tabular-nums text-[var(--text-secondary)]">{taskCount != null ? String(taskCount) : "0"}</span> tasks
               </span>
               <span className="text-[var(--border-primary)]">|</span>
               <span>
-                <span className="font-medium tabular-nums text-[var(--text-secondary)]">{jurorPoolSize != null ? String(jurorPoolSize) : "-"}</span> jurors
+                <span className="font-medium tabular-nums text-[var(--text-secondary)]">{jurorPoolSize != null ? String(jurorPoolSize) : "0"}</span> jurors
               </span>
               <span className="text-[var(--border-primary)]">|</span>
               <span className="flex items-center gap-1.5">
@@ -81,15 +81,15 @@ export function Header() {
             </div>
 
             <ConnectButton.Custom>
-              {({ account, chain, openConnectModal, openAccountModal, mounted }) => {
+              {({ account, openConnectModal, openAccountModal, mounted }) => {
                 if (!mounted) return null;
                 if (!account) {
                   return (
                     <button
                       onClick={openConnectModal}
-                      className="btn-press cursor-pointer border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] px-4 py-1.5 text-[13px] font-medium hover:bg-[var(--accent-hover)]"
+                      className="btn-press cursor-pointer border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] px-3 sm:px-4 py-1.5 text-[12px] sm:text-[13px] font-medium hover:bg-[var(--accent-hover)]"
                     >
-                      Connect Wallet
+                      Connect
                     </button>
                   );
                 }
@@ -99,7 +99,6 @@ export function Header() {
                     className="btn-press cursor-pointer border border-[var(--border-primary)] bg-transparent text-[var(--text-primary)] px-3 py-1.5 text-[12px] font-mono hover:border-[var(--text-primary)]"
                   >
                     {account.displayName}
-                    {chain?.name ? ` · ${chain.name}` : ""}
                   </button>
                 );
               }}

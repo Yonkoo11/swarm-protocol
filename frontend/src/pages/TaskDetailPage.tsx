@@ -11,7 +11,7 @@ export function TaskDetailPage() {
     return (
       <div className="flex flex-col gap-4">
         <BackLink />
-        <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-12 text-center">
+        <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
           <p className="m-0 text-sm text-[var(--danger)]">Invalid task ID.</p>
         </div>
       </div>

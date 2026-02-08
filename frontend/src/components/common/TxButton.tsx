@@ -15,9 +15,9 @@ interface TxButtonProps {
 
 const variantClasses = {
   primary:
-    "bg-[var(--text-primary)] hover:bg-[var(--accent-hover)] text-[var(--bg-primary)]",
+    "border-none bg-[var(--text-primary)] hover:bg-[var(--accent-hover)] text-[var(--bg-primary)]",
   danger:
-    "bg-[var(--danger)] hover:bg-red-700 text-white",
+    "border-none bg-[var(--danger)] hover:bg-red-700 text-white",
   secondary:
     "border border-[var(--border-primary)] bg-transparent text-[var(--text-primary)] hover:border-[var(--text-primary)]",
 };
@@ -40,7 +40,7 @@ export function TxButton({
       <button
         onClick={onClick}
         disabled={disabled || busy}
-        className={`btn-press px-4 py-2.5 text-sm font-medium border-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${variantClasses[variant]}`}
+        className={`btn-press px-4 py-2.5 text-sm font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${variantClasses[variant]}`}
       >
         {isPending ? (
           <span className="flex items-center gap-2">

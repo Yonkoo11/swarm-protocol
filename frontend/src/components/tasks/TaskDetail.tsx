@@ -27,7 +27,7 @@ export function TaskDetail({ taskId }: { taskId: bigint }) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--danger)]/20 bg-[var(--danger-muted)] p-8 text-center">
+      <div className="flex flex-col items-center gap-3 border border-[var(--danger)]/20 bg-[var(--danger-muted)] p-8 text-center">
         <p className="m-0 text-sm text-[var(--danger)]">Error: {error.message}</p>
       </div>
     );
@@ -35,7 +35,7 @@ export function TaskDetail({ taskId }: { taskId: bigint }) {
 
   if (!task) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-12 text-center">
+      <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />

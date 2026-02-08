@@ -15,7 +15,7 @@ export function MyTasksPage() {
           <h2 className="m-0 text-xl font-semibold">My Tasks</h2>
           <p className="m-0 mt-1 text-sm text-[var(--text-tertiary)]">Track tasks you created or claimed.</p>
         </div>
-        <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-12 text-center">
+        <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -78,7 +78,7 @@ export function MyTasksPage() {
           </a>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col">
           {active.map((task) => (
             <TaskCard key={task.id.toString()} task={task} />
           ))}
@@ -100,10 +100,10 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`btn-press flex-1 px-3 py-1.5 text-xs font-medium cursor-pointer border-none ${
+      className={`btn-press flex-1 px-3 py-1.5 text-xs font-medium cursor-pointer border-0 bg-transparent ${
         active
-          ? "border-b-2 border-[var(--text-primary)] text-[var(--text-primary)] bg-transparent"
-          : "border-b-2 border-transparent text-[var(--text-tertiary)] bg-transparent hover:text-[var(--text-primary)]"
+          ? "border-b-2 border-[var(--text-primary)] text-[var(--text-primary)]"
+          : "border-b-2 border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
       }`}
     >
       {children}

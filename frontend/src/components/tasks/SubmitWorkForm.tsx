@@ -22,7 +22,7 @@ export function SubmitWorkForm({ taskId, onSuccess }: SubmitWorkFormProps) {
         value={proofHash}
         onChange={(e) => setProofHash(e.target.value)}
         placeholder="Proof hash (IPFS CID, commit SHA, etc.)"
-        className="w-full rounded-[var(--radius-sm)] border border-[var(--border-primary)] bg-[var(--bg-tertiary)] px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
+        className="w-full border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
       />
       <TxButton
         onClick={() => submitWork(taskId, proofHash)}

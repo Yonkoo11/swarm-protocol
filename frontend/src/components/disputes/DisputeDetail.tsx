@@ -14,7 +14,7 @@ export function DisputeDetail({ disputeId }: { disputeId: bigint }) {
   if (isLoading) return <div className="skeleton h-40 w-full" />;
   if (!dispute) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-8 text-center">
+      <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-8 text-center">
         <p className="m-0 text-sm text-[var(--text-tertiary)]">Dispute not found</p>
       </div>
     );

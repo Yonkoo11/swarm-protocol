@@ -19,7 +19,7 @@ export function TaskList() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--danger)]/20 bg-[var(--danger-muted)] p-8 text-center">
+      <div className="flex flex-col items-center gap-3 border border-[var(--danger)]/20 bg-[var(--danger-muted)] p-8 text-center">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <line x1="12" y1="8" x2="12" y2="12" />
@@ -58,7 +58,7 @@ export function TaskList() {
       {filtered.length === 0 ? (
         <EmptyState filter={filter} />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col">
           {filtered.map((task) => (
             <TaskCard key={task.id.toString()} task={task} />
           ))}
@@ -80,7 +80,7 @@ function FilterButton({
   return (
     <button
       onClick={onClick}
-      className={`btn-press px-2 py-1.5 text-xs font-medium cursor-pointer bg-transparent ${
+      className={`btn-press px-2 py-1.5 text-xs font-medium cursor-pointer bg-transparent border-0 ${
         active
           ? "border-b-2 border-[var(--text-primary)] text-[var(--text-primary)]"
           : "border-b-2 border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
@@ -93,7 +93,7 @@ function FilterButton({
 
 function EmptyState({ filter }: { filter: number | null }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-12 text-center">
+    <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
