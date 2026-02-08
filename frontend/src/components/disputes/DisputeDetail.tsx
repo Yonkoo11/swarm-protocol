@@ -53,7 +53,7 @@ export function DisputeDetail({ disputeId }: { disputeId: bigint }) {
       )}
 
       <div className="flex flex-col gap-2">
-        <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+        <span className="section-label">
           Jurors ({dispute.voteCount}/3 voted)
         </span>
         <div className="flex flex-col gap-1.5">

@@ -54,7 +54,7 @@ export function TaskDetail({ taskId }: { taskId: bigint }) {
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <h2 className="m-0 text-xl font-semibold">Task #{task.id.toString()}</h2>
+        <h2 className="m-0 text-2xl">Task #{task.id.toString()}</h2>
         <StatusBadge status={status} />
       </div>
 
@@ -105,10 +105,10 @@ export function TaskDetail({ taskId }: { taskId: bigint }) {
       <div
         className="border border-[var(--border-primary)] p-5"
       >
-        <h3 className="m-0 mb-2 text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+        <h3 className="section-label m-0 mb-3">
           Description
         </h3>
-        <p className="m-0 break-all text-sm leading-relaxed text-[var(--text-primary)]">
+        <p className="drop-cap m-0 break-all text-[15px] leading-relaxed text-[var(--text-primary)]" style={{ maxWidth: "65ch" }}>
           {task.descriptionHash}
         </p>
       </div>
@@ -118,7 +118,7 @@ export function TaskDetail({ taskId }: { taskId: bigint }) {
         <div
           className="border border-[var(--border-primary)] p-5"
         >
-          <h3 className="m-0 mb-2 text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+          <h3 className="section-label m-0 mb-3">
             Proof of Work
           </h3>
           <p className="m-0 break-all font-mono text-sm text-[var(--text-primary)]">
@@ -154,7 +154,7 @@ export function TaskDetail({ taskId }: { taskId: bigint }) {
 function InfoRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[11px] font-medium uppercase tracking-wider text-[var(--text-tertiary)]">{label}</span>
+      <span className="section-label">{label}</span>
       <span className="text-sm">{children}</span>
     </div>
   );

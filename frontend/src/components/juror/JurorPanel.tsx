@@ -14,7 +14,7 @@ export function JurorPanel() {
       <div
         className="border border-[var(--border-primary)] p-5"
       >
-        <h3 className="m-0 mb-4 text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+        <h3 className="section-label m-0 mb-4">
           Pool Status
         </h3>
         <div className="flex flex-col gap-3">
@@ -56,7 +56,7 @@ export function JurorPanel() {
       <div
         className="border border-[var(--border-primary)] p-5"
       >
-        <h3 className="m-0 mb-3 text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+        <h3 className="section-label m-0 mb-3">
           How It Works
         </h3>
         <div className="flex flex-col gap-3">

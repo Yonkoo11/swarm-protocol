@@ -23,38 +23,45 @@ export function Header() {
 
   return (
     <header className="w-full bg-[var(--bg-primary)]">
+      {/* Top thin rule */}
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-4">
+        <hr className="rule" />
+      </div>
+
       {/* Masthead */}
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 pt-6 pb-4 text-center">
-        <p className="m-0 text-[11px] uppercase tracking-[0.2em] text-[var(--text-tertiary)] mb-2">
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-5 text-center">
+        <p className="m-0 text-[10px] uppercase tracking-[0.25em] text-[var(--text-tertiary)] mb-3 font-medium">
           Decentralised Task Protocol on Base
         </p>
-        <h1 className="m-0 text-5xl md:text-6xl tracking-tight text-[var(--text-primary)]">
+        <h1 className="m-0 text-5xl md:text-7xl tracking-[-0.02em] text-[var(--text-primary)] leading-none">
           HiveMind
         </h1>
-        <p className="m-0 text-[12px] text-[var(--text-tertiary)] mt-2">
+        <p className="m-0 text-[11px] text-[var(--text-tertiary)] mt-3 italic">
           {today}
         </p>
       </div>
 
-      {/* Heavy rule */}
+      {/* Double rule */}
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
-        <hr className="rule rule--heavy" />
+        <hr className="rule--double" />
       </div>
 
       {/* Nav + Stats + Wallet row */}
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-3">
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 py-2.5">
         <div className="flex items-center justify-between gap-3">
           {/* Nav links */}
-          <nav className="flex items-center gap-1 flex-wrap">
-            {navLinks.map((link) => (
+          <nav className="flex items-center gap-0 flex-wrap">
+            {navLinks.map((link, i) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `btn-press px-2 sm:px-3 py-1.5 text-[12px] sm:text-[13px] font-medium no-underline border-b-2 ${
+                  `btn-press px-3 sm:px-4 py-2 text-[12px] sm:text-[13px] no-underline border-b-2 ${
+                    i > 0 ? "border-l border-l-[var(--border-primary)]" : ""
+                  } ${
                     isActive
-                      ? "border-[var(--text-primary)] text-[var(--text-primary)]"
-                      : "border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:border-[var(--border-primary)]"
+                      ? "border-b-[var(--text-primary)] text-[var(--text-primary)] font-semibold"
+                      : "border-b-transparent text-[var(--text-tertiary)] font-medium hover:text-[var(--text-primary)]"
                   }`
                 }
               >
@@ -65,18 +72,19 @@ export function Header() {
 
           {/* Right side: stats + wallet */}
           <div className="flex items-center gap-5 shrink-0">
-            <div className="hidden md:flex items-center gap-4 text-[12px] text-[var(--text-tertiary)]">
+            <div className="hidden md:flex items-center gap-4 text-[11px] text-[var(--text-tertiary)]">
               <span>
-                <span className="font-medium tabular-nums text-[var(--text-secondary)]">{taskCount != null ? String(taskCount) : "0"}</span> tasks
+                <span className="font-semibold tabular-nums text-[var(--text-primary)] text-[13px]">{taskCount != null ? String(taskCount) : "0"}</span>
+                <span className="ml-1">tasks</span>
               </span>
-              <span className="text-[var(--border-primary)]">|</span>
+              <span className="text-[var(--border-primary)]">/</span>
               <span>
-                <span className="font-medium tabular-nums text-[var(--text-secondary)]">{jurorPoolSize != null ? String(jurorPoolSize) : "0"}</span> jurors
+                <span className="font-semibold tabular-nums text-[var(--text-primary)] text-[13px]">{jurorPoolSize != null ? String(jurorPoolSize) : "0"}</span>
+                <span className="ml-1">jurors</span>
               </span>
-              <span className="text-[var(--border-primary)]">|</span>
               <span className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" />
-                Base Sepolia
+                <span className="pulse-dot h-[6px] w-[6px] rounded-full bg-[var(--success)]" />
+                <span className="text-[var(--success)] font-medium">Live</span>
               </span>
             </div>
 
@@ -87,7 +95,7 @@ export function Header() {
                   return (
                     <button
                       onClick={openConnectModal}
-                      className="btn-press cursor-pointer border border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] px-3 sm:px-4 py-1.5 text-[12px] sm:text-[13px] font-medium hover:bg-[var(--accent-hover)]"
+                      className="btn-press cursor-pointer border-2 border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg-primary)] px-4 sm:px-5 py-1.5 text-[12px] sm:text-[13px] font-semibold uppercase tracking-wider hover:bg-transparent hover:text-[var(--text-primary)]"
                     >
                       Connect
                     </button>
@@ -107,7 +115,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* Thin rule */}
+      {/* Bottom thin rule */}
       <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
         <hr className="rule" />
       </div>

@@ -4,9 +4,9 @@ export function CreateTaskPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="m-0 text-xl font-semibold">Create Task</h2>
-        <p className="m-0 mt-1 text-sm text-[var(--text-tertiary)]">
-          Post a task with a USDC reward. Workers stake a bond to claim it.
+        <h2 className="m-0 text-2xl md:text-3xl">Post a Task</h2>
+        <p className="m-0 mt-1.5 text-sm text-[var(--text-tertiary)] italic">
+          Set a reward in USDC. Workers stake a bond to claim it.
         </p>
       </div>
       <CreateTaskForm />

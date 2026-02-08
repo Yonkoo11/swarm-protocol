@@ -25,6 +25,15 @@ export default function App() {
             </Routes>
           </div>
         </main>
+        <footer className="w-full mt-auto">
+          <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
+            <hr className="rule" />
+            <div className="py-6 flex items-center justify-between text-[11px] text-[var(--text-tertiary)]">
+              <span className="italic">HiveMind Protocol on Base Sepolia</span>
+              <span className="tabular-nums">MMXXVI</span>
+            </div>
+          </div>
+        </footer>
       </div>
     </BrowserRouter>
   );

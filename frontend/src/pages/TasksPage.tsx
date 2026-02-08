@@ -6,9 +6,9 @@ export function TasksPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h2 className="m-0 text-xl font-semibold">Task Marketplace</h2>
-          <p className="m-0 mt-1 text-sm text-[var(--text-tertiary)]">
-            Browse USDC-funded tasks. Claim work, stake bonds, get paid.
+          <h2 className="m-0 text-2xl md:text-3xl">Task Marketplace</h2>
+          <p className="m-0 mt-1.5 text-sm text-[var(--text-tertiary)] italic">
+            Browse open tasks, claim work, earn USDC.
           </p>
         </div>
         <Link

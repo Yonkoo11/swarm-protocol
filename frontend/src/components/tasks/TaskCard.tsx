@@ -9,13 +9,13 @@ export function TaskCard({ task }: { task: Task }) {
   return (
     <Link
       to={`/tasks/${task.id.toString()}`}
-      className="block border-b border-[var(--border-primary)] py-4 px-0 no-underline hover:bg-[var(--bg-tertiary)]"
+      className="task-item block border-b border-[var(--border-primary)] py-5 no-underline"
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-2">
+      <div className="flex items-start justify-between gap-6">
+        <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex items-center gap-2">
-            <span className="tabular-nums text-xs font-medium text-[var(--text-tertiary)]">
-              #{task.id.toString()}
+            <span className="tabular-nums text-[11px] text-[var(--text-tertiary)]">
+              No. {task.id.toString()}
             </span>
             <StatusBadge status={task.status} />
             {task.parentTaskId > 0n && (
@@ -24,17 +24,21 @@ export function TaskCard({ task }: { task: Task }) {
               </span>
             )}
           </div>
-          <p className="m-0 text-sm leading-snug text-[var(--text-primary)] line-clamp-1" style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
+          <p className="headline m-0 text-base leading-snug text-[var(--text-primary)] line-clamp-2">
             {task.descriptionHash}
           </p>
-          <AddressDisplay address={task.creator} label="by" />
+          <div className="mt-0.5">
+            <AddressDisplay address={task.creator} label="by" />
+          </div>
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-1.5">
-          <UsdcAmount amount={task.reward} className="text-sm" />
-          <span className="text-[11px] text-[var(--text-tertiary)]">
-            Bond: <UsdcAmount amount={task.bondAmount} className="text-[11px]" />
+        <div className="flex shrink-0 flex-col items-end gap-1">
+          <span className="font-semibold text-lg tabular-nums text-[var(--text-primary)]">
+            <UsdcAmount amount={task.reward} className="text-base" />
           </span>
-          <span className="tabular-nums text-[11px] text-[var(--text-tertiary)]">
+          <span className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider">
+            Bond: <UsdcAmount amount={task.bondAmount} className="text-[10px]" />
+          </span>
+          <span className="tabular-nums text-[11px] text-[var(--text-tertiary)] italic">
             {formatDeadline(task.deadline)}
           </span>
         </div>

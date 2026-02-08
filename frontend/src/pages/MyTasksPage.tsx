@@ -12,8 +12,8 @@ export function MyTasksPage() {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="m-0 text-xl font-semibold">My Tasks</h2>
-          <p className="m-0 mt-1 text-sm text-[var(--text-tertiary)]">Track tasks you created or claimed.</p>
+          <h2 className="m-0 text-2xl md:text-3xl">My Tasks</h2>
+          <p className="m-0 mt-1.5 text-sm text-[var(--text-tertiary)] italic">Track tasks you created or claimed.</p>
         </div>
         <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -30,7 +30,7 @@ export function MyTasksPage() {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="m-0 text-xl font-semibold">My Tasks</h2>
+          <h2 className="m-0 text-2xl md:text-3xl">My Tasks</h2>
         </div>
         <div className="flex flex-col gap-3">
           {[1, 2].map((i) => (
@@ -48,8 +48,8 @@ export function MyTasksPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="m-0 text-xl font-semibold">My Tasks</h2>
-        <p className="m-0 mt-1 text-sm text-[var(--text-tertiary)]">Track tasks you created or claimed.</p>
+        <h2 className="m-0 text-2xl md:text-3xl">My Tasks</h2>
+        <p className="m-0 mt-1.5 text-sm text-[var(--text-tertiary)] italic">Track tasks you created or claimed.</p>
       </div>
 
       <div className="flex gap-0 border-b border-[var(--border-primary)]">
