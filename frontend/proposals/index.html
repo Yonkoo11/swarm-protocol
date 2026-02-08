@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Proposals | HiveMind</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #1A1A1A;
+            --text-primary: #FFFFFF;
+            --text-muted: #666666;
+            --accent-green: #047857;
+            --accent-gold: #D4AF37;
+            --border: #2A2A2A;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #064E3B 0%, #047857 100%);
+            padding: 32px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-gold);
+        }
+        .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 14px; }
+        .catalogue {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+        }
+        .proposal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+        }
+        .proposal-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .preview-frame {
+            position: relative;
+            aspect-ratio: 16/10;
+            background: #000;
+            overflow: hidden;
+        }
+        .preview-frame iframe {
+            width: 200%;
+            height: 200%;
+            transform: scale(0.5);
+            transform-origin: top left;
+            border: none;
+            pointer-events: none;
+        }
+        .preview-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.2s ease-out;
+        }
+        .proposal-card:hover .preview-overlay { opacity: 1; }
+        .open-btn {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .card-info { padding: 20px; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .card-title { font-size: 20px; font-weight: 600; }
+        .dna-badge {
+            background: var(--bg-primary);
+            border: 1px solid var(--accent-gold);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 11px;
+            color: var(--accent-gold);
+        }
+        .card-description {
+            font-size: 14px;
+            color: #A0A0A0;
+            margin-bottom: 16px;
+        }
+        .dna-breakdown {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .dna-gene {
+            background: var(--bg-primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .dna-gene strong { color: #A0A0A0; }
+        .inspiration {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            .catalogue { grid-template-columns: 1fr; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Design Proposals</h1>
+        <p>HiveMind | 3 proposals | Generated 2026-02-08</p>
+    </header>
+    <main class="catalogue">
+        <!-- Proposal 1: Terminal -->
+        <div class="proposal-card">
+            <div class="preview-frame">
+                <iframe src="proposal-1.html" loading="lazy"></iframe>
+                <div class="preview-overlay">
+                    <a href="proposal-1.html" class="open-btn">Open Full View</a>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <span class="card-title">The Terminal</span>
+                    <span class="dna-badge">DNA-G-C-M-M-M</span>
+                </div>
+                <p class="card-description">SSH into the blockchain. CRT scanlines, boot sequence, htop-style task table, command prompt interactions. Pure monospace.</p>
+                <div class="dna-breakdown">
+                    <span class="dna-gene"><strong>Layout:</strong> Grid</span>
+                    <span class="dna-gene"><strong>Nav:</strong> CLI</span>
+                    <span class="dna-gene"><strong>Hero:</strong> Minimal</span>
+                    <span class="dna-gene"><strong>Color:</strong> Mono</span>
+                    <span class="dna-gene"><strong>Type:</strong> Mono</span>
+                </div>
+                <p class="inspiration">Inspired by htop + retro terminals</p>
+            </div>
+        </div>
+
+        <!-- Proposal 2: Broadsheet -->
+        <div class="proposal-card">
+            <div class="preview-frame">
+                <iframe src="proposal-2.html" loading="lazy"></iframe>
+                <div class="preview-overlay">
+                    <a href="proposal-2.html" class="open-btn">Open Full View</a>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <span class="card-title">The Broadsheet</span>
+                    <span class="dna-badge">DNA-A-T-T-W-E</span>
+                </div>
+                <p class="card-description">Financial Times meets web3. Newspaper columns, drop caps, serif masthead, classified-ad juror pool. Print-density information design.</p>
+                <div class="dna-breakdown">
+                    <span class="dna-gene"><strong>Layout:</strong> Asymmetric</span>
+                    <span class="dna-gene"><strong>Nav:</strong> Top</span>
+                    <span class="dna-gene"><strong>Hero:</strong> Text</span>
+                    <span class="dna-gene"><strong>Color:</strong> Warm</span>
+                    <span class="dna-gene"><strong>Type:</strong> Serif</span>
+                </div>
+                <p class="inspiration">Inspired by Financial Times + Bloomberg Businessweek</p>
+            </div>
+        </div>
+
+        <!-- Proposal 3: War Room -->
+        <div class="proposal-card">
+            <div class="preview-frame">
+                <iframe src="proposal-3.html" loading="lazy"></iframe>
+                <div class="preview-overlay">
+                    <a href="proposal-3.html" class="open-btn">Open Full View</a>
+                </div>
+            </div>
+            <div class="card-info">
+                <div class="card-header">
+                    <span class="card-title">The War Room</span>
+                    <span class="dna-badge">DNA-D-T-I-C-X</span>
+                </div>
+                <p class="card-description">NASA mission control. Radar pulse, targeting bracket corners, intel feed, countdown timers. Makes bounty hunting feel like covert ops.</p>
+                <div class="dna-breakdown">
+                    <span class="dna-gene"><strong>Layout:</strong> Dense</span>
+                    <span class="dna-gene"><strong>Nav:</strong> Top-bar</span>
+                    <span class="dna-gene"><strong>Hero:</strong> Info</span>
+                    <span class="dna-gene"><strong>Color:</strong> Cool</span>
+                    <span class="dna-gene"><strong>Type:</strong> Mixed</span>
+                </div>
+                <p class="inspiration">Inspired by NASA Mission Control + NORAD</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMind - Task Marketplace</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background: #FDF6E3;
+      color: #1a1a1a;
+      font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.45;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== TYPOGRAPHY ===== */
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', 'Georgia', serif;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    a {
+      color: #1a1a1a;
+      text-decoration: none;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    a:hover {
+      color: #C41E3A;
+      border-bottom-color: #C41E3A;
+    }
+
+    /* ===== RULES (horizontal lines) ===== */
+    .rule {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      margin: 0;
+    }
+
+    .rule--thick {
+      border-top-width: 3px;
+    }
+
+    .rule--double {
+      border-top: 3px double #1a1a1a;
+    }
+
+    .rule--hair {
+      border-top: 0.5px solid #999;
+    }
+
+
+    /* ===== MASTHEAD ===== */
+    .masthead {
+      text-align: center;
+      padding: 28px 0 0;
+    }
+
+    .masthead__name {
+      font-family: 'Playfair Display', serif;
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: 18px;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .masthead__tagline {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    /* ===== DATELINE BAR ===== */
+    .dateline-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .dateline-bar__left,
+    .dateline-bar__right {
+      display: flex;
+      gap: 20px;
+    }
+
+    .dateline-bar span {
+      white-space: nowrap;
+    }
+
+    /* ===== PROTOCOL STATS (Pull Quote Style) ===== */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      padding: 14px 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 0 16px;
+      border-right: 1px solid #ccc;
+    }
+
+    .stat:last-child {
+      border-right: none;
+    }
+
+    .stat__number {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat__label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 6px 0 4px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+
+    /* ===== MAIN GRID ===== */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 0;
+      margin-top: 4px;
+    }
+
+    .main-content {
+      border-right: 1px solid #1a1a1a;
+      padding-right: 24px;
+    }
+
+    .sidebar {
+      padding-left: 24px;
+    }
+
+    /* ===== CONTENT GRID (inside main) ===== */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 58% 42%;
+      gap: 0;
+    }
+
+    .content-grid__primary {
+      padding-right: 20px;
+      border-right: 1px solid #ccc;
+    }
+
+    .content-grid__secondary {
+      padding-left: 20px;
+    }
+
+    /* ===== FEATURED TASK ===== */
+    .featured-task__headline {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: color 0.15s ease-out;
+    }
+
+    .featured-task__meta {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 0.5px solid #ccc;
+    }
+
+    .featured-task__meta span {
+      margin-right: 12px;
+    }
+
+    .featured-task__reward {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .featured-task__body {
+      column-count: 2;
+      column-gap: 20px;
+      column-rule: 0.5px solid #ccc;
+      font-size: 13.5px;
+      line-height: 1.55;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .featured-task__body p {
+      margin-bottom: 10px;
+    }
+
+    /* Drop cap */
+    .drop-cap::first-letter {
+      font-family: 'Playfair Display', serif;
+      float: left;
+      font-size: 62px;
+      font-weight: 900;
+      line-height: 0.8;
+      padding-right: 6px;
+      padding-top: 4px;
+      color: #1a1a1a;
+    }
+
+    /* ===== TASK LIST ===== */
+    .task-list {
+      list-style: none;
+    }
+
+    .task-item {
+      padding: 8px 0;
+      border-bottom: 0.5px solid #ccc;
+      cursor: pointer;
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-item__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .task-item__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.25;
+      flex: 1;
+    }
+
+    .task-item__reward {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .task-item__excerpt {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.4;
+      margin-top: 3px;
+    }
+
+    .task-item__meta {
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+
+    /* ===== SIDEBAR SECTIONS ===== */
+    .sidebar-section {
+      margin-bottom: 20px;
+    }
+
+    .sidebar-section__title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .sidebar-section__title--red {
+      color: #C41E3A;
+      border-bottom-color: #C41E3A;
+    }
+
+    /* ===== JUROR LIST ===== */
+    .juror-list {
+      list-style: none;
+    }
+
+    .juror-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 0.5px dotted #ccc;
+      font-size: 12px;
+    }
+
+    .juror-item:last-child {
+      border-bottom: none;
+    }
+
+    .juror-item__address {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 11px;
+    }
+
+    .juror-item__stake {
+      font-weight: 700;
+      font-size: 11px;
+      color: #1a1a1a;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .juror-item__status {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+    }
+
+    /* ===== DISPUTES ===== */
+    .dispute-item {
+      padding: 8px 0;
+      border-bottom: 0.5px solid #ccc;
+    }
+
+    .dispute-item:last-child {
+      border-bottom: none;
+    }
+
+    .dispute-item__tag {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #C41E3A;
+    }
+
+    .dispute-item__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-top: 2px;
+    }
+
+    .dispute-item__detail {
+      font-size: 11px;
+      color: #555;
+      line-height: 1.4;
+      margin-top: 3px;
+    }
+
+    .dispute-item__parties {
+      font-size: 10px;
+      color: #888;
+      margin-top: 3px;
+      font-style: italic;
+    }
+
+    /* ===== MARKET DATA ===== */
+    .market-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .market-table th {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 4px 0;
+      border-bottom: 1px solid #1a1a1a;
+      color: #666;
+    }
+
+    .market-table th:last-child {
+      text-align: right;
+    }
+
+    .market-table td {
+      padding: 4px 0;
+      border-bottom: 0.5px dotted #ccc;
+      vertical-align: top;
+    }
+
+    .market-table td:last-child {
+      text-align: right;
+      font-weight: 700;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ===== CLASSIFIED AD STYLE ===== */
+    .classified {
+      border: 1px solid #1a1a1a;
+      padding: 10px;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .classified__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .classified__body {
+      font-size: 11px;
+      line-height: 1.4;
+      margin-top: 4px;
+      color: #555;
+    }
+
+    .classified__cta {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: 1px solid #1a1a1a;
+      padding: 4px 12px;
+      transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    }
+
+    .classified__cta:hover {
+      background: #1a1a1a;
+      color: #FDF6E3;
+    }
+
+    /* ===== BELOW-THE-FOLD SECTION ===== */
+    .below-fold {
+      margin-top: 20px;
+    }
+
+    .below-fold__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+    }
+
+    .below-fold__col {
+      padding: 0 16px;
+      border-right: 1px solid #ccc;
+    }
+
+    .below-fold__col:first-child {
+      padding-left: 0;
+    }
+
+    .below-fold__col:last-child {
+      border-right: none;
+      padding-right: 0;
+    }
+
+    .below-fold__headline {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .below-fold__text {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #333;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .below-fold__text p {
+      margin-bottom: 6px;
+    }
+
+    .below-fold__meta {
+      font-size: 10px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      padding: 12px 0;
+      margin-top: 4px;
+      font-size: 9px;
+      color: #999;
+      letter-spacing: 0.3px;
+      line-height: 1.6;
+    }
+
+    .footer__grid {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer__col {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .footer__label {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #666;
+    }
+
+    .footer code {
+      font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+      font-size: 8px;
+      background: rgba(0,0,0,0.04);
+      padding: 1px 4px;
+      letter-spacing: -0.3px;
+    }
+
+    code {
+      font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+      font-size: 0.9em;
+      background: rgba(0,0,0,0.04);
+      padding: 1px 4px;
+    }
+
+    /* ===== UTILITY CLASSES ===== */
+    .rule--footer { margin-top: 16px; }
+    .classified--second { margin-top: 8px; }
+    .rule--bottom { margin-bottom: 24px; }
+    .footer__col--right { text-align: right; }
+
+    /* ===== INTERACTIVE STATES ===== */
+    .task-item {
+      transition: background-color 0.15s ease-out;
+      padding-left: 4px;
+      padding-right: 4px;
+      margin-left: -4px;
+      margin-right: -4px;
+    }
+
+    @media (hover: hover) {
+      .task-item:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+
+      .juror-item:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
+
+      .featured-task__headline:hover {
+        color: #C41E3A;
+      }
+    }
+
+    .task-item__title a,
+    .featured-task__headline a {
+      border-bottom: none;
+    }
+
+    .task-item__title a:hover {
+      color: #C41E3A;
+    }
+
+    /* ===== FOCUS STATES ===== */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid #C41E3A;
+      outline-offset: 2px;
+    }
+
+    .classified__cta:focus-visible {
+      outline-offset: 3px;
+    }
+
+    /* ===== CONNECT WALLET ===== */
+    .connect-wallet {
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #1a1a1a;
+      background: #FDF6E3;
+      border: 1px solid #1a1a1a;
+      padding: 6px 14px;
+      cursor: pointer;
+      z-index: 100;
+      transition: background-color 0.15s ease-out, color 0.15s ease-out;
+    }
+
+    .connect-wallet:hover {
+      background: #1a1a1a;
+      color: #FDF6E3;
+    }
+
+
+    /* ===== TAGS (base + variants) ===== */
+    .tag {
+      display: inline-block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    .tag--breaking {
+      letter-spacing: 1.5px;
+      color: #FDF6E3;
+      background: #C41E3A;
+      padding: 1px 6px;
+    }
+
+    .tag--open {
+      color: #1a1a1a;
+      border: 1px solid #1a1a1a;
+    }
+
+    .tag--claimed {
+      color: #888;
+      border: 1px solid #ccc;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .main-content {
+        border-right: none;
+        padding-right: 0;
+      }
+
+      .sidebar {
+        padding-left: 0;
+        padding-top: 16px;
+        border-top: 1px solid #1a1a1a;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .content-grid__primary {
+        padding-right: 0;
+        border-right: none;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .content-grid__secondary {
+        padding-left: 0;
+        padding-top: 16px;
+      }
+
+      .featured-task__body {
+        column-count: 1;
+      }
+
+      .below-fold__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .below-fold__col {
+        padding: 12px 0;
+        border-right: none;
+        border-bottom: 0.5px solid #ccc;
+      }
+
+      .below-fold__col:last-child {
+        border-bottom: none;
+      }
+
+      .masthead__name {
+        font-size: 42px;
+        letter-spacing: 10px;
+      }
+
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        row-gap: 12px;
+      }
+
+      .stat {
+        border-right: none;
+      }
+
+      .stat:nth-child(odd) {
+        border-right: 1px solid #ccc;
+      }
+
+      .dateline-bar {
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+      }
+
+      .dateline-bar__left,
+      .dateline-bar__right {
+        justify-content: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0 12px;
+      }
+
+      .masthead__name {
+        font-size: 32px;
+        letter-spacing: 6px;
+      }
+
+      .featured-task__headline {
+        font-size: 24px;
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .connect-wallet {
+        position: static;
+        display: block;
+        width: 100%;
+        font-size: 9px;
+        padding: 8px 10px;
+        margin-bottom: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="connect-wallet">Connect Wallet</button>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <hr class="rule rule--thick">
+    <h1 class="masthead__name">HIVEMIND</h1>
+    <p class="masthead__tagline">Task Marketplace &middot; Base Network</p>
+    <hr class="rule rule--double">
+  </header>
+
+  <!-- Dateline Bar -->
+  <div class="dateline-bar">
+    <div class="dateline-bar__left">
+      <span>Base Sepolia &middot; Saturday, February 8, 2026</span>
+    </div>
+    <div class="dateline-bar__right">
+      <span>Block 18,442,307</span>
+      <span>Gas: 0.001 gwei</span>
+      <span>USDC/USD $1.00</span>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- Protocol Stats -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat__number">42</div>
+      <div class="stat__label">Total Tasks Posted</div>
+    </div>
+    <div class="stat">
+      <div class="stat__number">8</div>
+      <div class="stat__label">Active Bounties</div>
+    </div>
+    <div class="stat">
+      <div class="stat__number">7</div>
+      <div class="stat__label">Registered Jurors</div>
+    </div>
+    <div class="stat">
+      <div class="stat__number">$12,500</div>
+      <div class="stat__label">USDC Locked in Escrow</div>
+    </div>
+  </div>
+
+  <hr class="rule rule--thick">
+
+  <!-- Main Grid -->
+  <div class="main-grid">
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+
+      <!-- Content Grid: Featured + Task List -->
+      <div class="content-grid">
+
+        <!-- Primary: Featured Task -->
+        <div class="content-grid__primary">
+          <div class="section-header">Open Bounties</div>
+
+          <article class="featured-task">
+            <h2 class="featured-task__headline">Base Protocol Seeks Auditor for Cross-Chain Bridge Verification Module</h2>
+            <div class="featured-task__meta">
+              <span class="tag tag--open">Open</span>
+              <span>Task #0037</span>
+              <span>&middot;</span>
+              <span>Posted 3h ago by <strong>0xA3f...92d</strong></span>
+              <span>&middot;</span>
+              <span class="featured-task__reward">2,500 USDC</span>
+            </div>
+
+            <div class="featured-task__body">
+              <p class="drop-cap">An independent security researcher is needed to perform a comprehensive audit of the cross-chain bridge verification module deployed on Base mainnet. The module handles message attestation from Ethereum L1, validates Merkle proofs against the state root published by the sequencer, and releases bridged assets upon successful verification. The current implementation uses a three-of-five multisig for emergency pause functionality, and the audit should evaluate whether this threshold is sufficient given the total value locked.</p>
+
+              <p>The scope includes all Solidity contracts in the <code>src/bridge/</code> directory, approximately 1,200 lines of code across four contracts. Prior audit reports from OpenZeppelin and Trail of Bits are available for reference. The researcher should focus on reentrancy vectors in the claim flow, potential griefing attacks on the message queue, and correctness of the Merkle proof verification logic. Edge cases around L1 reorgs and delayed finality must also be addressed.</p>
+
+              <p>Deliverables include a written report following the standard severity classification (Critical, High, Medium, Low, Informational), a Foundry-based proof of concept for any High or Critical findings, and a 30-minute walkthrough call with the development team. The deadline for submission is February 22, 2026. Payment of 2,500 USDC is released from escrow upon acceptance of the final report by the task poster.</p>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Secondary: Task List -->
+        <div class="content-grid__secondary">
+          <div class="section-header">Latest Dispatches</div>
+
+          <ul class="task-list">
+            <li class="task-item">
+              <div class="task-item__header">
+                <span class="task-item__title">Design Token-Gated Dashboard for DAO Governance Portal</span>
+                <span class="task-item__reward">1,800 USDC</span>
+              </div>
+              <p class="task-item__excerpt">Full Figma-to-React implementation with wallet connect, proposal voting interface, and delegation views.</p>
+              <div class="task-item__meta"><span class="tag tag--open">Open</span> Task #0041 &middot; 1h ago &middot; 3 applicants</div>
+            </li>
+
+            <li class="task-item">
+              <div class="task-item__header">
+                <span class="task-item__title">Write Subgraph Indexer for NFT Royalty Distributions</span>
+                <span class="task-item__reward">900 USDC</span>
+              </div>
+              <p class="task-item__excerpt">The Graph subgraph tracking ERC-2981 royalty payments across Base. Must index historical data from block 12M.</p>
+              <div class="task-item__meta"><span class="tag tag--open">Open</span> Task #0040 &middot; 5h ago &middot; 1 applicant</div>
+            </li>
+
+            <li class="task-item">
+              <div class="task-item__header">
+                <span class="task-item__title">Implement Gasless Meta-Transaction Relayer</span>
+                <span class="task-item__reward">2,200 USDC</span>
+              </div>
+              <p class="task-item__excerpt">ERC-2771 compatible forwarder with EIP-712 signed messages. Must support batch execution.</p>
+              <div class="task-item__meta"><span class="tag tag--claimed">Claimed</span> Task #0039 &middot; 12h ago &middot; Worker: 0xB7c...41f</div>
+            </li>
+
+            <li class="task-item">
+              <div class="task-item__header">
+                <span class="task-item__title">Optimize AMM Constant-Product Math Library</span>
+                <span class="task-item__reward">1,500 USDC</span>
+              </div>
+              <p class="task-item__excerpt">Replace OpenZeppelin Math with inline assembly for sqrt and mulDiv. Target: 40% gas reduction.</p>
+              <div class="task-item__meta"><span class="tag tag--open">Open</span> Task #0038 &middot; 1d ago &middot; 0 applicants</div>
+            </li>
+
+            <li class="task-item">
+              <div class="task-item__header">
+                <span class="task-item__title">Build CLI Tool for Batch Airdrop Claims</span>
+                <span class="task-item__reward">650 USDC</span>
+              </div>
+              <p class="task-item__excerpt">Rust CLI that reads a Merkle tree JSON, generates proofs, and submits claim transactions. Must handle nonce management.</p>
+              <div class="task-item__meta"><span class="tag tag--claimed">Claimed</span> Task #0036 &middot; 2d ago &middot; Worker: 0x91e...c03</div>
+            </li>
+
+            <li class="task-item">
+              <div class="task-item__header">
+                <span class="task-item__title">Formal Verification of Escrow Release Logic</span>
+                <span class="task-item__reward">3,000 USDC</span>
+              </div>
+              <p class="task-item__excerpt">Certora or Halmos spec covering all state transitions in HiveMind escrow. Must prove no funds can be permanently locked.</p>
+              <div class="task-item__meta"><span class="tag tag--open">Open</span> Task #0035 &middot; 3d ago &middot; 2 applicants</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Recently Completed -->
+      <hr class="rule rule--footer">
+      <div class="below-fold">
+        <div class="section-header">Recently Completed</div>
+        <div class="below-fold__grid">
+
+          <div class="below-fold__col">
+            <h3 class="below-fold__headline">Foundry Test Suite for Staking Module</h3>
+            <div class="below-fold__meta">Task #0032 &middot; Completed 2d ago &middot; 1,400 USDC</div>
+            <div class="below-fold__text">
+              <p>95% branch coverage across 6 contracts. Worker 0x91e...c03 delivered in 4 days. No disputes filed. Escrow released at block 18,438,201.</p>
+            </div>
+          </div>
+
+          <div class="below-fold__col">
+            <h3 class="below-fold__headline">ERC-4626 Vault Integration</h3>
+            <div class="below-fold__meta">Task #0030 &middot; Completed 5d ago &middot; 2,000 USDC</div>
+            <div class="below-fold__text">
+              <p>Yield-bearing vault wrapper for idle escrow funds. Worker 0xB7c...41f delivered 3 contracts + deployment scripts. Accepted after one revision round.</p>
+            </div>
+          </div>
+
+          <div class="below-fold__col">
+            <h3 class="below-fold__headline">Protocol Documentation &amp; API Reference</h3>
+            <div class="below-fold__meta">Task #0028 &middot; Completed 8d ago &middot; 600 USDC</div>
+            <div class="below-fold__text">
+              <p>Full Docusaurus site covering contract ABIs, event schemas, and integration guides. Deployed to hivemind-docs.vercel.app. Accepted same day.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <!-- Juror Pool -->
+      <div class="sidebar-section">
+        <div class="sidebar-section__title">Juror Pool</div>
+        <ul class="juror-list">
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0xD4a...f82</div>
+              <div class="juror-item__status">Active &middot; 23 cases</div>
+            </div>
+            <div class="juror-item__stake">1,200 USDC</div>
+          </li>
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0x72F...a19</div>
+              <div class="juror-item__status">Active &middot; 18 cases</div>
+            </div>
+            <div class="juror-item__stake">800 USDC</div>
+          </li>
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0xE91...3b7</div>
+              <div class="juror-item__status">Active &middot; 11 cases</div>
+            </div>
+            <div class="juror-item__stake">750 USDC</div>
+          </li>
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0x5Cc...e44</div>
+              <div class="juror-item__status">Active &middot; 9 cases</div>
+            </div>
+            <div class="juror-item__stake">600 USDC</div>
+          </li>
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0xA8b...7d1</div>
+              <div class="juror-item__status">Active &middot; 5 cases</div>
+            </div>
+            <div class="juror-item__stake">550 USDC</div>
+          </li>
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0x3Fe...c90</div>
+              <div class="juror-item__status">Cooldown &middot; 3 cases</div>
+            </div>
+            <div class="juror-item__stake">500 USDC</div>
+          </li>
+          <li class="juror-item">
+            <div>
+              <div class="juror-item__address">0x1Ba...205</div>
+              <div class="juror-item__status">New &middot; 0 cases</div>
+            </div>
+            <div class="juror-item__stake">500 USDC</div>
+          </li>
+        </ul>
+      </div>
+
+      <hr class="rule rule--hair">
+
+      <!-- Active Disputes -->
+      <div class="sidebar-section">
+        <div class="sidebar-section__title sidebar-section__title--red">Active Disputes</div>
+
+        <div class="dispute-item">
+          <div class="dispute-item__tag"><span class="tag tag--breaking">Contested</span> Case #0008</div>
+          <div class="dispute-item__title">Worker Claims Deliverable Met Spec; Poster Alleges Missing Test Coverage</div>
+          <div class="dispute-item__detail">Poster demands 80% line coverage per task description. Worker submitted 62%. Worker argues integration tests cover critical paths. Juror panel convened, voting open until block 18,445,000.</div>
+          <div class="dispute-item__parties">0xB7c...41f v. 0x44D...e71 &middot; 1,200 USDC at stake</div>
+        </div>
+
+        <div class="dispute-item">
+          <div class="dispute-item__tag"><span class="tag tag--breaking">Under Review</span> Case #0007</div>
+          <div class="dispute-item__title">Late Submission Dispute: 47 Minutes Past Deadline</div>
+          <div class="dispute-item__detail">Worker's final commit timestamp is 47 minutes after the deadline. Worker cites Base sequencer downtime as cause. On-chain records show 22-minute sequencer delay at the relevant block range.</div>
+          <div class="dispute-item__parties">0x91e...c03 v. 0xA3f...92d &middot; 900 USDC at stake</div>
+        </div>
+      </div>
+
+      <hr class="rule rule--hair">
+
+      <!-- Protocol Activity -->
+      <div class="sidebar-section">
+        <div class="sidebar-section__title">Protocol Activity</div>
+        <table class="market-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Total Paid Out</td>
+              <td>$47,200</td>
+            </tr>
+            <tr>
+              <td>Tasks Completed</td>
+              <td>34</td>
+            </tr>
+            <tr>
+              <td>Avg. Completion</td>
+              <td>5.2 days</td>
+            </tr>
+            <tr>
+              <td>Dispute Rate</td>
+              <td>11.7%</td>
+            </tr>
+            <tr>
+              <td>Resolution Rate</td>
+              <td>100%</td>
+            </tr>
+            <tr>
+              <td>Unique Workers</td>
+              <td>19</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="rule rule--hair">
+
+      <!-- Actions -->
+      <div class="classified">
+        <div class="classified__title">Become a Juror</div>
+        <p class="classified__body">Stake 500 USDC. Earn 5% of contested bounty value per ruling.</p>
+        <a href="#" class="classified__cta">Stake &amp; Register</a>
+      </div>
+
+      <div class="classified classified--second">
+        <div class="classified__title">Post a Task</div>
+        <p class="classified__body">Fund escrow. Set scope and deadline. Pay on acceptance.</p>
+        <a href="#" class="classified__cta">Create Bounty</a>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Footer -->
+  <hr class="rule rule--thick rule--footer">
+  <footer class="footer">
+    <div class="footer__grid">
+      <div class="footer__col">
+        <span class="footer__label">Contract Addresses</span><br>
+        HiveMind Core: <code>0x7a23...4f91</code><br>
+        Escrow Vault: <code>0x3bc8...a207</code><br>
+        Juror Registry: <code>0x91df...c842</code><br>
+        Dispute Resolver: <code>0xe4a1...7b53</code>
+      </div>
+      <div class="footer__col">
+        <span class="footer__label">Network</span><br>
+        Chain: Base Sepolia (ID: 84532)<br>
+        Block: 18,442,307 &middot; Finalized: 18,442,290<br>
+        Sequencer: Online &middot; L1 Batch: 4,201,889
+      </div>
+      <div class="footer__col">
+        <span class="footer__label">Protocol</span><br>
+        Version: 0.3.2-beta<br>
+        Dispute Fee: 2% of bounty<br>
+        Juror Quorum: 3 of 5<br>
+        Escrow Lock: 14 days max
+      </div>
+      <div class="footer__col footer__col--right">
+        <span class="footer__label">Notice</span><br>
+        HIVEMIND is experimental software on a testnet.<br>
+        No warranties expressed or implied.<br>
+        &copy; 2026 HiveMind Protocol Contributors
+      </div>
+    </div>
+  </footer>
+
+  <hr class="rule rule--bottom">
+
+</body>
+</html>
