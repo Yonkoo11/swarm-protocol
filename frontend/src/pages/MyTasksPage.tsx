@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useAllTasks } from "../hooks/useSwarmCoordinator";
 import { TaskCard } from "../components/tasks/TaskCard";
+import { TaskStatus } from "../lib/constants";
 
 export function MyTasksPage() {
   const { address } = useAccount();
@@ -41,8 +42,14 @@ export function MyTasksPage() {
     );
   }
 
-  const created = tasks.filter((t) => t.creator.toLowerCase() === address.toLowerCase());
-  const assigned = tasks.filter((t) => t.assignee.toLowerCase() === address.toLowerCase());
+  const addr = address.toLowerCase();
+  const created = tasks.filter((t) => t.creator.toLowerCase() === addr);
+  const assigned = tasks.filter((t) => t.assignee.toLowerCase() === addr);
+  const completed = tasks.filter(
+    (t) =>
+      t.status === TaskStatus.Completed &&
+      (t.creator.toLowerCase() === addr || t.assignee.toLowerCase() === addr)
+  );
   const active = tab === "created" ? created : assigned;
 
   return (
@@ -51,6 +58,17 @@ export function MyTasksPage() {
         <h2 className="m-0 text-2xl md:text-3xl">My Tasks</h2>
         <p className="m-0 mt-1.5 text-sm text-[var(--text-tertiary)] italic">Track tasks you created or claimed.</p>
       </div>
+
+      {(created.length > 0 || assigned.length > 0) && (
+        <>
+          <p className="section-label m-0">
+            <span className="font-semibold tabular-nums">{created.length}</span> created,{" "}
+            <span className="font-semibold tabular-nums">{assigned.length}</span> assigned,{" "}
+            <span className="font-semibold tabular-nums">{completed.length}</span> completed
+          </p>
+          <hr className="rule" />
+        </>
+      )}
 
       <div className="flex gap-0 border-b border-[var(--border-primary)]">
         <TabButton active={tab === "created"} onClick={() => setTab("created")}>

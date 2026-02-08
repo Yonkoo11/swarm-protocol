@@ -55,6 +55,7 @@ export function TaskList() {
           );
         })}
       </div>
+      <hr className="rule" />
       {filtered.length === 0 ? (
         <EmptyState filter={filter} />
       ) : (

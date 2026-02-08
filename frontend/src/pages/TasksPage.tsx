@@ -1,7 +1,19 @@
 import { Link } from "react-router-dom";
 import { TaskList } from "../components/tasks/TaskList";
+import { useAllTasks, useDisputeCount } from "../hooks/useSwarmCoordinator";
+import { formatUsdc } from "../lib/formatters";
 
 export function TasksPage() {
+  const { tasks, isLoading } = useAllTasks();
+  const { data: disputeCount } = useDisputeCount();
+
+  const totalTasks = tasks.length;
+  const openTasks = tasks.filter((t) => t.status === 0).length;
+  const usdcPool = tasks
+    .filter((t) => t.status === 0)
+    .reduce((sum, t) => sum + t.reward, 0n);
+  const disputes = disputeCount != null ? Number(disputeCount) : null;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
@@ -23,8 +35,53 @@ export function TasksPage() {
           <span className="sm:hidden">New</span>
         </Link>
       </div>
+
+      {/* Protocol Stats Bar */}
+      <div className="border border-[var(--border-primary)] px-6 py-4">
+        <div className="flex items-center justify-center gap-0">
+          <StatCell
+            value={isLoading ? "-" : String(totalTasks)}
+            label="tasks"
+          />
+          <StatDivider />
+          <StatCell
+            value={isLoading ? "-" : String(openTasks)}
+            label="open"
+          />
+          <StatDivider />
+          <StatCell
+            value={isLoading ? "-" : formatUsdc(usdcPool)}
+            label="USDC pool"
+          />
+          <StatDivider />
+          <StatCell
+            value={disputes != null ? String(disputes) : "-"}
+            label="disputes"
+          />
+        </div>
+      </div>
+
       <hr className="rule" />
       <TaskList />
     </div>
+  );
+}
+
+function StatCell({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1 px-5 sm:px-8">
+      <span className="text-2xl sm:text-3xl font-semibold tabular-nums font-mono text-[var(--text-primary)] leading-none">
+        {value}
+      </span>
+      <span className="section-label text-[10px] sm:text-[11px] tracking-[0.08em]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function StatDivider() {
+  return (
+    <span className="text-[var(--text-tertiary)] text-lg select-none">/</span>
   );
 }

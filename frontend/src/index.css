@@ -290,3 +290,61 @@ input, textarea, select {
   0% { transform: scale(1); opacity: 0.4; }
   100% { transform: scale(2.5); opacity: 0; }
 }
+
+/* ──────────────────────────────────────────────
+   Stat Values (large display numbers)
+   ────────────────────────────────────────────── */
+.stat-value {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+/* ──────────────────────────────────────────────
+   Stat Labels (below numbers)
+   ────────────────────────────────────────────── */
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* ──────────────────────────────────────────────
+   Breadcrumb Trail
+   ────────────────────────────────────────────── */
+.breadcrumb {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb a {
+  color: var(--text-tertiary);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.breadcrumb .separator {
+  color: var(--border-primary);
+}
+
+/* ──────────────────────────────────────────────
+   Editorial Text Blocks
+   ────────────────────────────────────────────── */
+.editorial {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 65ch;
+}
