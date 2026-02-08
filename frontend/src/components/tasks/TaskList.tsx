@@ -8,15 +8,29 @@ export function TaskList() {
   const [filter, setFilter] = useState<number | null>(null);
 
   if (isLoading) {
-    return <div className="text-[var(--text-secondary)] text-sm">Loading tasks...</div>;
+    return (
+      <div className="flex flex-col gap-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="skeleton h-24 w-full" />
+        ))}
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-red-400 text-sm">Error loading tasks: {error.message}</div>;
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--danger)]/20 bg-[var(--danger-muted)] p-8 text-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <p className="m-0 text-sm text-[var(--danger)]">Failed to load tasks: {error.message}</p>
+      </div>
+    );
   }
 
   const reversed = [...tasks].reverse();
-
   const filtered = filter !== null
     ? reversed.filter((t) => t.status === filter)
     : reversed;
@@ -42,7 +56,7 @@ export function TaskList() {
         })}
       </div>
       {filtered.length === 0 ? (
-        <p className="text-sm text-[var(--text-secondary)]">No tasks found.</p>
+        <EmptyState filter={filter} />
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((task) => (
@@ -66,13 +80,37 @@ function FilterButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
+      className={`btn-press px-2 py-1.5 text-xs font-medium cursor-pointer bg-transparent ${
         active
-          ? "border-[var(--accent)] bg-[var(--accent)]/15 text-[var(--accent)]"
-          : "border-[var(--border-color)] bg-transparent text-[var(--text-secondary)] hover:border-[var(--accent)]/40"
+          ? "border-b-2 border-[var(--text-primary)] text-[var(--text-primary)]"
+          : "border-b-2 border-transparent text-[var(--text-tertiary)] hover:text-[var(--text-primary)]"
       }`}
     >
       {children}
     </button>
+  );
+}
+
+function EmptyState({ filter }: { filter: number | null }) {
+  return (
+    <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-12 text-center">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+      </svg>
+      <p className="m-0 text-sm text-[var(--text-tertiary)]">
+        {filter !== null ? "No tasks match this filter." : "No tasks created yet."}
+      </p>
+      {filter === null && (
+        <a
+          href="/create"
+          className="btn-press inline-flex items-center gap-1.5 bg-[var(--text-primary)] px-3 py-1.5 text-xs font-medium text-[var(--bg-primary)] no-underline hover:bg-[var(--accent-hover)]"
+        >
+          Create the first task
+        </a>
+      )}
+    </div>
   );
 }

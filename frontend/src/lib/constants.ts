@@ -28,12 +28,12 @@ export const STATUS_LABELS: Record<number, string> = {
 };
 
 export const STATUS_COLORS: Record<number, string> = {
-  0: "bg-emerald-500/20 text-emerald-400",
-  1: "bg-blue-500/20 text-blue-400",
-  2: "bg-amber-500/20 text-amber-400",
-  3: "bg-red-500/20 text-red-400",
-  4: "bg-gray-500/20 text-gray-400",
-  5: "bg-gray-500/20 text-gray-500",
+  0: "border border-[#2E7D32] text-[#2E7D32]",
+  1: "border border-[#1565C0] text-[#1565C0]",
+  2: "border border-[#B8860B] text-[#B8860B]",
+  3: "border border-[#C41E3A] text-[#C41E3A]",
+  4: "border border-[#6b6b6b] text-[#6b6b6b]",
+  5: "border border-[#999] text-[#999]",
 };
 
 export const ERROR_MESSAGES: Record<string, string> = {

@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Header } from "./components/layout/Header";
-import { Sidebar } from "./components/layout/Sidebar";
 import { TasksPage } from "./pages/TasksPage";
 import { MyTasksPage } from "./pages/MyTasksPage";
 import { TaskDetailPage } from "./pages/TaskDetailPage";
@@ -11,11 +10,10 @@ import { JurorPage } from "./pages/JurorPage";
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen flex-col">
+      <div className="min-h-screen flex flex-col">
         <Header />
-        <div className="flex flex-1">
-          <Sidebar />
-          <main className="flex-1 p-6">
+        <main className="flex-1 w-full max-w-[1280px] mx-auto px-6 lg:px-10 py-8">
+          <div className="fade-in">
             <Routes>
               <Route path="/" element={<Navigate to="/tasks" replace />} />
               <Route path="/tasks" element={<TasksPage />} />
@@ -25,8 +23,8 @@ export default function App() {
               <Route path="/disputes" element={<DisputesPage />} />
               <Route path="/juror" element={<JurorPage />} />
             </Routes>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </BrowserRouter>
   );

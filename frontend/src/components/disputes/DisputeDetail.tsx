@@ -11,8 +11,14 @@ export function DisputeDetail({ disputeId }: { disputeId: bigint }) {
   const { data: task } = useTask(dispute?.taskId ?? 0n);
   const { address } = useAccount();
 
-  if (isLoading) return <div className="text-[var(--text-secondary)]">Loading...</div>;
-  if (!dispute) return <div className="text-[var(--text-secondary)]">Dispute not found</div>;
+  if (isLoading) return <div className="skeleton h-40 w-full" />;
+  if (!dispute) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-[var(--radius-lg)] border border-dashed border-[var(--border-primary)] py-8 text-center">
+        <p className="m-0 text-sm text-[var(--text-tertiary)]">Dispute not found</p>
+      </div>
+    );
+  }
 
   const jurorIndex = address
     ? dispute.jurors.findIndex((j) => j.toLowerCase() === address.toLowerCase())
@@ -20,20 +26,26 @@ export function DisputeDetail({ disputeId }: { disputeId: bigint }) {
   const isJuror = jurorIndex >= 0;
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] p-5">
+    <div
+      className="flex flex-col gap-4 border border-[var(--border-primary)] p-5"
+    >
       <div className="flex items-center gap-3">
-        <h3 className="m-0 text-lg font-bold">Dispute #{disputeId.toString()}</h3>
+        <h3 className="m-0 text-base font-semibold">Dispute #{disputeId.toString()}</h3>
         {dispute.resolved ? (
-          <span className="rounded-full bg-gray-500/20 px-2 py-0.5 text-xs text-gray-400">Resolved</span>
+          <span className="inline-flex items-center border border-[var(--text-tertiary)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">
+            Resolved
+          </span>
         ) : (
-          <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs text-red-400">Active</span>
+          <span className="inline-flex items-center border border-[var(--danger)] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--danger)]">
+            Active
+          </span>
         )}
       </div>
 
       {task && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--text-secondary)]">Task:</span>
-          <a href={`/tasks/${task.id.toString()}`} className="text-[var(--accent)] no-underline text-sm hover:underline">
+          <span className="text-xs text-[var(--text-tertiary)]">Task:</span>
+          <a href={`/tasks/${task.id.toString()}`} className="text-[var(--text-primary)] underline text-sm">
             #{task.id.toString()}
           </a>
           <StatusBadge status={task.status} />
@@ -41,29 +53,31 @@ export function DisputeDetail({ disputeId }: { disputeId: bigint }) {
       )}
 
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-[var(--text-secondary)]">
+        <span className="text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
           Jurors ({dispute.voteCount}/3 voted)
         </span>
-        {dispute.jurors.map((juror, i) => (
-          <div key={i} className="flex items-center gap-2">
-            {juror === ZERO ? (
-              <span className="text-xs text-[var(--text-secondary)]">Slot {i + 1}: Empty</span>
-            ) : (
-              <>
-                <AddressDisplay address={juror} />
-                {i < dispute.voteCount && (
-                  <span className={`text-xs ${dispute.votes[i] ? "text-emerald-400" : "text-red-400"}`}>
-                    {dispute.votes[i] ? "For worker" : "For creator"}
-                  </span>
-                )}
-              </>
-            )}
-          </div>
-        ))}
+        <div className="flex flex-col gap-1.5">
+          {dispute.jurors.map((juror, i) => (
+            <div key={i} className="flex items-center gap-2 border-b border-[var(--border-primary)] px-3 py-2">
+              {juror === ZERO ? (
+                <span className="text-xs text-[var(--text-tertiary)]">Slot {i + 1}: Empty</span>
+              ) : (
+                <>
+                  <AddressDisplay address={juror} />
+                  {i < dispute.voteCount && (
+                    <span className={`ml-auto text-xs font-medium ${dispute.votes[i] ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>
+                      {dispute.votes[i] ? "For worker" : "For creator"}
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {isJuror && !dispute.resolved && (
-        <div className="flex gap-3 pt-2">
+        <div className="flex gap-3 border-t border-[var(--border-primary)] pt-4">
           <VoteButton disputeId={disputeId} inFavorOfAssignee={true} onSuccess={refetch} />
           <VoteButton disputeId={disputeId} inFavorOfAssignee={false} onSuccess={refetch} />
         </div>

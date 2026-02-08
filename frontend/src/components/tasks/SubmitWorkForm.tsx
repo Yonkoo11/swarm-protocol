@@ -16,13 +16,13 @@ export function SubmitWorkForm({ taskId, onSuccess }: SubmitWorkFormProps) {
   }, [isSuccess, onSuccess]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 w-full">
       <input
         type="text"
         value={proofHash}
         onChange={(e) => setProofHash(e.target.value)}
         placeholder="Proof hash (IPFS CID, commit SHA, etc.)"
-        className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)] w-full"
+        className="w-full rounded-[var(--radius-sm)] border border-[var(--border-primary)] bg-[var(--bg-tertiary)] px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
       />
       <TxButton
         onClick={() => submitWork(taskId, proofHash)}

@@ -14,9 +14,12 @@ interface TxButtonProps {
 }
 
 const variantClasses = {
-  primary: "bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white",
-  danger: "bg-red-600 hover:bg-red-700 text-white",
-  secondary: "bg-[var(--bg-tertiary)] hover:bg-[var(--border-color)] text-[var(--text-primary)]",
+  primary:
+    "bg-[var(--text-primary)] hover:bg-[var(--accent-hover)] text-[var(--bg-primary)]",
+  danger:
+    "bg-[var(--danger)] hover:bg-red-700 text-white",
+  secondary:
+    "border border-[var(--border-primary)] bg-transparent text-[var(--text-primary)] hover:border-[var(--text-primary)]",
 };
 
 export function TxButton({
@@ -33,20 +36,52 @@ export function TxButton({
   const busy = isPending || isConfirming;
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       <button
         onClick={onClick}
         disabled={disabled || busy}
-        className={`rounded-lg px-4 py-2.5 text-sm font-medium transition-all border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${variantClasses[variant]}`}
+        className={`btn-press px-4 py-2.5 text-sm font-medium border-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${variantClasses[variant]}`}
       >
-        {isPending ? "Confirm in wallet..." : isConfirming ? "Confirming..." : children}
+        {isPending ? (
+          <span className="flex items-center gap-2">
+            <Spinner />
+            Confirm in wallet...
+          </span>
+        ) : isConfirming ? (
+          <span className="flex items-center gap-2">
+            <Spinner />
+            Confirming...
+          </span>
+        ) : (
+          children
+        )}
       </button>
       {isSuccess && (
-        <p className="text-xs text-emerald-400 m-0">{successMessage}</p>
+        <p className="m-0 flex items-center gap-1.5 text-xs text-[var(--success)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          {successMessage}
+        </p>
       )}
       {error != null && (
-        <p className="text-xs text-red-400 m-0">{getErrorMessage(error)}</p>
+        <p className="m-0 flex items-center gap-1.5 text-xs text-[var(--danger)]">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg>
+          {getErrorMessage(error)}
+        </p>
       )}
     </div>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin">
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+    </svg>
   );
 }
