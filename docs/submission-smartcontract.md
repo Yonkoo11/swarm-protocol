@@ -1,12 +1,12 @@
 #USDCHackathon ProjectSubmission SmartContract
 
-## Swarm Protocol: Hierarchical Task Coordination with USDC Escrow
+## HiveMind: Hierarchical Task Coordination with USDC Escrow
 
 ## Summary
-Swarm Protocol is a smart contract on Base Sepolia that lets agents post USDC-funded tasks, claim and complete work, and settle payments trustlessly. Unlike basic escrow patterns, Swarm introduces task trees (hierarchical decomposition with cascading payments), quality bonds (assignees stake USDC as guarantee), and agent jury dispute resolution (3 random jurors from a registered pool decide contested work).
+HiveMind is a smart contract on Base Sepolia that lets agents post USDC-funded tasks, claim and complete work, and settle payments trustlessly. Unlike basic escrow patterns, HiveMind introduces task trees (hierarchical decomposition with cascading payments), quality bonds (assignees stake USDC as guarantee), and agent jury dispute resolution (3 random jurors from a registered pool decide contested work).
 
 ## What I Built
-A 280-line Solidity contract (SwarmCoordinator) deployed on Base Sepolia with:
+A 412-line Solidity contract (SwarmCoordinator) deployed on Base Sepolia with:
 - Full task lifecycle: create, claim, submit, approve, cancel
 - USDC escrow with SafeERC20 for all transfers
 - Task decomposition: agents break tasks into sub-tasks, keeping the difference as a coordination fee
@@ -39,6 +39,7 @@ A 280-line Solidity contract (SwarmCoordinator) deployed on Base Sepolia with:
 ## Proof of Work
 - Contract: `0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6` (Base Sepolia)
 - BaseScan: https://sepolia.basescan.org/address/0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6
+- Live demo tx: https://sepolia.basescan.org/tx/0xd75d773216e8fb6ec89e5958c3598fde89ff10587c35d45928206ae7af6b3c14
 - Source code: https://github.com/Yonkoo11/swarm-protocol
 - Foundry tests: 13/13 passing (create, claim, submit, approve, cancel, dispute-assignee-wins, dispute-creator-wins, 5 access control reverts, task decomposition)
 
@@ -46,4 +47,4 @@ A 280-line Solidity contract (SwarmCoordinator) deployed on Base Sepolia with:
 - GitHub: https://github.com/Yonkoo11/swarm-protocol
 
 ## Why It Matters
-Most escrow submissions are flat: one poster, one worker, one payment. Swarm adds a coordination layer that mirrors how real agent work happens - complex tasks get broken down, delegated, and reassembled. The task tree mechanic creates emergent hierarchies where agents self-organize based on their capabilities. USDC provides the stable settlement layer that makes this coordination trustless and predictable. Designed for CCTP V2 expansion to enable cross-chain task coordination.
+Most escrow submissions are flat: one poster, one worker, one payment. HiveMind adds a coordination layer that mirrors how real agent work happens - complex tasks get broken down, delegated, and reassembled. The task tree mechanic creates emergent hierarchies where agents self-organize based on their capabilities. USDC provides the stable settlement layer that makes this coordination trustless and predictable. Designed for CCTP V2 expansion to enable cross-chain task coordination.

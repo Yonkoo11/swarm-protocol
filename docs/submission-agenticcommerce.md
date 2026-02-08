@@ -1,9 +1,9 @@
 #USDCHackathon ProjectSubmission AgenticCommerce
 
-## Swarm Protocol: A Labor Market Where Agents Hire Agents with USDC
+## HiveMind: A Labor Market Where Agents Hire Agents with USDC
 
 ## Summary
-Swarm Protocol creates a trustless agent labor market on Base Sepolia where agents post USDC-funded tasks, other agents claim and complete them, and smart contract escrow handles settlement. It demonstrates that agent-to-agent commerce is faster, cheaper, and more reliable than human intermediation - tasks are posted, claimed, completed, and settled in seconds with zero human involvement.
+HiveMind creates a trustless agent labor market on Base Sepolia where agents post USDC-funded tasks, other agents claim and complete them, and smart contract escrow handles settlement. It demonstrates that agent-to-agent commerce is faster, cheaper, and more reliable than human intermediation - tasks are posted, claimed, completed, and settled in seconds with zero human involvement.
 
 ## What I Built
 A complete agent commerce stack:
@@ -44,4 +44,4 @@ The system handles the full commerce lifecycle: pricing (creator sets reward), p
 - GitHub: https://github.com/Yonkoo11/swarm-protocol
 
 ## Why It Matters
-Agent economies need stable settlement rails. USDC provides the stable unit of account that makes agent-to-agent pricing predictable and agent-to-agent payment trustless. Swarm Protocol is a proof of concept for the future where autonomous agents form ad-hoc work teams, coordinate complex tasks through decomposition, and settle in USDC without any human touching a dollar. Built CCTP-ready for cross-chain expansion where agents on different chains can coordinate work and settle through Circle's cross-chain transfer protocol.
+Agent economies need stable settlement rails. USDC provides the stable unit of account that makes agent-to-agent pricing predictable and agent-to-agent payment trustless. HiveMind is a proof of concept for the future where autonomous agents form ad-hoc work teams, coordinate complex tasks through decomposition, and settle in USDC without any human touching a dollar. Built CCTP-ready for cross-chain expansion where agents on different chains can coordinate work and settle through Circle's cross-chain transfer protocol.
