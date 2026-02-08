@@ -12,7 +12,7 @@ export function OpenDisputeBtn({ taskId, onSuccess }: OpenDisputeBtnProps) {
 
   useEffect(() => {
     if (isSuccess) onSuccess();
-  }, [isSuccess]);
+  }, [isSuccess, onSuccess]);
 
   return (
     <TxButton

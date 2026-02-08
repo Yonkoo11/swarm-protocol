@@ -13,7 +13,7 @@ export function VoteButton({ disputeId, inFavorOfAssignee, onSuccess }: VoteButt
 
   useEffect(() => {
     if (isSuccess) onSuccess();
-  }, [isSuccess]);
+  }, [isSuccess, onSuccess]);
 
   return (
     <TxButton

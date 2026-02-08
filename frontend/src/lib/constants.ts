@@ -1,5 +1,5 @@
 export const SWARM_COORDINATOR_ADDRESS =
-  "0x96b25437fcd0b14576ba1ce5ec732aaa0d17cfc6" as const;
+  "0xec8419C9F4509d5e83E4329721cFCb9f27f6B649" as const;
 
 export const USDC_ADDRESS =
   "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as const;

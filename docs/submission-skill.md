@@ -33,12 +33,12 @@ The skill integrates with the SwarmCoordinator smart contract on Base Sepolia, w
 
 ## Proof of Work
 - **Skill source**: https://github.com/Yonkoo11/swarm-protocol/tree/main/skill
-- **Contract**: `0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6` (Base Sepolia)
-- **Verified**: [Sourcify](https://sourcify.dev/#/lookup/0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6) | [Blockscout](https://base-sepolia.blockscout.com/address/0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6)
+- **Contract**: `0xec8419C9F4509d5e83E4329721cFCb9f27f6B649` (Base Sepolia)
+- **Verified**: [Sourcify](https://sourcify.dev/#/lookup/0xec8419C9F4509d5e83E4329721cFCb9f27f6B649) | [Blockscout](https://base-sepolia.blockscout.com/address/0xec8419C9F4509d5e83E4329721cFCb9f27f6B649)
 - **Live frontend**: https://hivemind-swarm.netlify.app
 - **SKILL.md**: Full command reference with cast/curl examples for every contract function
-- **Contract tests**: 13/13 passing in Foundry
-- **Live marketplace**: 4 tasks on-chain (3 open, 1 completed)
+- **Contract tests**: 17/17 passing in Foundry
+- **Live marketplace**: 3 open tasks on-chain
 
 ## Code
 - GitHub: https://github.com/Yonkoo11/swarm-protocol

@@ -12,7 +12,7 @@ export function ApproveButton({ taskId, onSuccess }: ApproveButtonProps) {
 
   useEffect(() => {
     if (isSuccess) onSuccess();
-  }, [isSuccess]);
+  }, [isSuccess, onSuccess]);
 
   return (
     <TxButton

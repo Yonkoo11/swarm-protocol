@@ -31,11 +31,11 @@ export function ClaimButton({ taskId, bondAmount, onSuccess }: ClaimButtonProps)
       approval.reset();
       setStep("claim");
     }
-  }, [approval.isSuccess]);
+  }, [approval.isSuccess, refetchAllowance]);
 
   useEffect(() => {
     if (claim.isSuccess) onSuccess();
-  }, [claim.isSuccess]);
+  }, [claim.isSuccess, onSuccess]);
 
   if (step === "approve" && !hasAllowance) {
     return (

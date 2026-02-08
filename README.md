@@ -39,8 +39,8 @@ Creator                          Worker                          Jurors
 
 ```
 contracts/          Foundry project (Solidity 0.8.20)
-  src/              SwarmCoordinator.sol - 412 lines, core protocol
-  test/             13 Foundry tests (all passing)
+  src/              SwarmCoordinator.sol - 421 lines, core protocol
+  test/             17 Foundry tests (all passing)
   script/           Deployment script (Base Sepolia)
 frontend/           React + TypeScript + Vite + wagmi + RainbowKit
   src/
@@ -56,9 +56,9 @@ docs/               Hackathon submission posts
 | Item | Value |
 |------|-------|
 | Chain | Base Sepolia (84532) |
-| SwarmCoordinator | [`0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6`](https://base-sepolia.blockscout.com/address/0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6) |
+| SwarmCoordinator | [`0xec8419C9F4509d5e83E4329721cFCb9f27f6B649`](https://base-sepolia.blockscout.com/address/0xec8419C9F4509d5e83E4329721cFCb9f27f6B649) |
 | USDC | [`0x036CbD53842c5426634e7929541eC2318f3dCF7e`](https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e) |
-| Verification | [Sourcify (exact match)](https://sourcify.dev/#/lookup/0x96b25437FCd0B14576bA1ce5ec732aaA0d17CFC6) |
+| Verification | [Sourcify (exact match)](https://sourcify.dev/#/lookup/0xec8419C9F4509d5e83E4329721cFCb9f27f6B649) |
 
 ## Task Lifecycle
 
@@ -112,11 +112,9 @@ forge script script/Deploy.s.sol --rpc-url $BASE_SEPOLIA_RPC_URL --broadcast
 
 | Action | TX |
 |--------|----|
-| Create Task #1 | [`0xd75d77...`](https://sepolia.basescan.org/tx/0xd75d773216e8fb6ec89e5958c3598fde89ff10587c35d45928206ae7af6b3c14) |
-| Approve Work #1 | [`0xca8be6...`](https://sepolia.basescan.org/tx/0xca8be676c0a6e233300b64cd108d3d0a002a0e937aae7aba5e8a25a0f402eba0) |
-| Create Task #2 | [`0x30cffc...`](https://sepolia.basescan.org/tx/0x30cffc18547eba1ef9ce67be92ed2e170bc9b47cabc8c2d9df28696fdf42f625) |
-| Create Task #3 | [`0x92975e...`](https://sepolia.basescan.org/tx/0x92975e2cd73ee68eaa4532ec080dbc03678f2e8851e15f0773f1e36de4f2e253) |
-| Create Task #4 | [`0x28ea3d...`](https://sepolia.basescan.org/tx/0x28ea3d5d9aeb434207e085bbc12605c5a6c6c45182be6ccb9b7cc69e6866cee7) |
+| Create Task #1 | [`0xa6117e...`](https://sepolia.basescan.org/tx/0xa6117e299d9720bb72fcda2de19ad92b87782009c904196a566ffd8f3f1b3752) |
+| Create Task #2 | [`0xfefecf...`](https://sepolia.basescan.org/tx/0xfefecf060a3a878777d04922648cbb576d63219d0dd9859e68a41166f5ab801e) |
+| Create Task #3 | [`0xe67fca...`](https://sepolia.basescan.org/tx/0xe67fca8ff93d097e59f70c7eac32673e7f20e7abf3db6b7a639b7a1f3dde125e) |
 
 ## License
 

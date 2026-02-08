@@ -62,6 +62,7 @@ contract SwarmCoordinator is ReentrancyGuard {
     mapping(uint256 => Dispute) public disputes;
     mapping(address => bool) public registeredJurors;
     address[] public jurorPool;
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
 
     // --- Events ---
 
@@ -256,9 +257,9 @@ contract SwarmCoordinator is ReentrancyGuard {
             }
         }
         if (jurorIndex == type(uint8).max) revert NotRegisteredJuror();
+        if (hasVoted[disputeId][msg.sender]) revert AlreadyVoted();
 
-        // Check not already voted (vote defaults to false, use voteCount tracking)
-        // Simple approach: track via voteCount and juror matching
+        hasVoted[disputeId][msg.sender] = true;
         dispute.votes[jurorIndex] = inFavorOfAssignee;
         dispute.voteCount++;
 
@@ -341,12 +342,16 @@ contract SwarmCoordinator is ReentrancyGuard {
             uint256 payout = task.reward - juryFee;
             usdc.safeTransfer(task.assignee, payout + task.bondAmount);
 
-            // Split jury fee among 3 jurors
+            // Split jury fee among 3 jurors, remainder to treasury
             uint256 perJuror = juryFee / 3;
+            uint256 remainder = juryFee - (perJuror * 3);
             for (uint8 i = 0; i < 3; i++) {
                 if (perJuror > 0) {
                     usdc.safeTransfer(dispute.jurors[i], perJuror);
                 }
+            }
+            if (remainder > 0) {
+                usdc.safeTransfer(treasury, remainder);
             }
         } else {
             // Creator wins: gets reward back + assignee's bond (minus jury fee)
@@ -354,12 +359,16 @@ contract SwarmCoordinator is ReentrancyGuard {
             uint256 creatorRefund = task.reward + task.bondAmount - juryFee;
             usdc.safeTransfer(task.creator, creatorRefund);
 
-            // Split jury fee among 3 jurors
+            // Split jury fee among 3 jurors, remainder to treasury
             uint256 perJuror = juryFee / 3;
+            uint256 remainder = juryFee - (perJuror * 3);
             for (uint8 i = 0; i < 3; i++) {
                 if (perJuror > 0) {
                     usdc.safeTransfer(dispute.jurors[i], perJuror);
                 }
+            }
+            if (remainder > 0) {
+                usdc.safeTransfer(treasury, remainder);
             }
         }
 

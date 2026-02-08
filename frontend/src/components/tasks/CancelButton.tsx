@@ -12,7 +12,7 @@ export function CancelButton({ taskId, onSuccess }: CancelButtonProps) {
 
   useEffect(() => {
     if (isSuccess) onSuccess();
-  }, [isSuccess]);
+  }, [isSuccess, onSuccess]);
 
   return (
     <TxButton

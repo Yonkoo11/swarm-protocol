@@ -36,15 +36,18 @@ export function CreateTaskForm() {
       approval.reset();
       setStep("create");
     }
-  }, [approval.isSuccess]);
+  }, [approval.isSuccess, refetchAllowance]);
 
   function handleApprove() {
     approval.approve(totalNeeded);
   }
 
   function handleCreate() {
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + Number(deadlineDays) * 86400);
-    create.createTask(rewardAmount, bondAmount, description, deadline, BigInt(parentTaskId || "0"));
+    const days = Math.max(1, Number(deadlineDays) || 7);
+    const deadline = BigInt(Math.floor(Date.now() / 1000) + days * 86400);
+    let parent = 0n;
+    try { parent = BigInt(parentTaskId || "0"); } catch { /* default 0 */ }
+    create.createTask(rewardAmount, bondAmount, description, deadline, parent);
   }
 
   if (!address) {

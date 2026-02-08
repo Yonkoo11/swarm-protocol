@@ -209,6 +209,81 @@ contract SwarmCoordinatorTest is Test {
         assertEq(usdc.balanceOf(alice), aliceBalanceBefore + expectedRefund);
     }
 
+    function test_revert_doubleVote() public {
+        _registerJurors();
+
+        vm.prank(alice);
+        uint256 taskId = escrow.createTask(REWARD, BOND, "ipfs://task1", block.timestamp + ONE_DAY, 0);
+
+        vm.prank(bob);
+        escrow.claimTask(taskId);
+
+        vm.prank(bob);
+        escrow.submitWork(taskId, "ipfs://proof1");
+
+        vm.prank(alice);
+        escrow.openDispute(taskId);
+
+        // Juror votes once
+        vm.prank(juror1);
+        escrow.castVote(1, true);
+
+        // Same juror tries to vote again - should revert
+        vm.prank(juror1);
+        vm.expectRevert(SwarmCoordinator.AlreadyVoted.selector);
+        escrow.castVote(1, false);
+    }
+
+    function test_revert_claimWhenNotOpen() public {
+        vm.prank(alice);
+        uint256 taskId = escrow.createTask(REWARD, BOND, "ipfs://task1", block.timestamp + ONE_DAY, 0);
+
+        // Bob claims
+        vm.prank(bob);
+        escrow.claimTask(taskId);
+
+        // Charlie tries to claim the already-claimed task
+        address charlie = makeAddr("charlie");
+        usdc.mint(charlie, 100e6);
+        vm.prank(charlie);
+        usdc.approve(address(escrow), type(uint256).max);
+
+        vm.prank(charlie);
+        vm.expectRevert(SwarmCoordinator.TaskNotOpen.selector);
+        escrow.claimTask(taskId);
+    }
+
+    function test_revert_submitWithoutClaim() public {
+        vm.prank(alice);
+        uint256 taskId = escrow.createTask(REWARD, BOND, "ipfs://task1", block.timestamp + ONE_DAY, 0);
+
+        // Try to submit on an unclaimed (Open) task
+        vm.prank(bob);
+        vm.expectRevert(SwarmCoordinator.TaskNotClaimed.selector);
+        escrow.submitWork(taskId, "ipfs://proof1");
+    }
+
+    function test_revert_disputeInsufficientJurors() public {
+        // Only register 2 jurors (need 3)
+        vm.prank(juror1);
+        escrow.registerJuror();
+        vm.prank(juror2);
+        escrow.registerJuror();
+
+        vm.prank(alice);
+        uint256 taskId = escrow.createTask(REWARD, BOND, "ipfs://task1", block.timestamp + ONE_DAY, 0);
+
+        vm.prank(bob);
+        escrow.claimTask(taskId);
+
+        vm.prank(bob);
+        escrow.submitWork(taskId, "ipfs://proof1");
+
+        vm.prank(alice);
+        vm.expectRevert(SwarmCoordinator.InsufficientJurors.selector);
+        escrow.openDispute(taskId);
+    }
+
     // --- Access Control ---
 
     function test_revert_claimOwnTask() public {
