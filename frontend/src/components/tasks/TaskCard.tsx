@@ -1,48 +1,57 @@
-import { Link } from "react-router-dom";
-import { StatusBadge } from "../common/StatusBadge";
-import { UsdcAmount } from "../common/UsdcAmount";
-import { AddressDisplay } from "../common/AddressDisplay";
-import { formatDeadline } from "../../lib/formatters";
+import { useEffect, useRef } from "react";
+import { STATUS_LABELS } from "../../lib/constants";
+import { formatUsdc, truncateAddress } from "../../lib/formatters";
 import type { Task } from "../../lib/types";
 
-export function TaskCard({ task }: { task: Task }) {
+const STATUS_NAMES: Record<number, string> = {
+  0: "open",
+  1: "claimed",
+  2: "submitted",
+  3: "disputed",
+  4: "completed",
+  5: "cancelled",
+};
+
+interface TaskCardProps {
+  task: Task;
+  index?: number;
+  onClick: () => void;
+}
+
+export function TaskCard({ task, index = 0, onClick }: TaskCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const timer = setTimeout(() => el.classList.add("visible"), 40 + index * 60);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  const statusName = STATUS_NAMES[task.status] ?? "open";
+
   return (
-    <Link
-      to={`/tasks/${task.id.toString()}`}
-      className="task-item block border-b border-[var(--border-primary)] py-5 no-underline"
+    <div
+      ref={ref}
+      className="task-card"
+      data-status={statusName}
+      onClick={onClick}
     >
-      <div className="flex items-start justify-between gap-6">
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <span className="tabular-nums text-[11px] text-[var(--text-tertiary)]">
-              No. {task.id.toString()}
-            </span>
-            <StatusBadge status={task.status} />
-            {task.parentTaskId > 0n && (
-              <span className="border border-[var(--border-primary)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--text-tertiary)]">
-                Sub-task of #{task.parentTaskId.toString()}
-              </span>
-            )}
-          </div>
-          <p className="headline m-0 text-base leading-snug text-[var(--text-primary)] line-clamp-2">
-            {task.descriptionHash}
-          </p>
-          <div className="mt-0.5">
-            <AddressDisplay address={task.creator} label="by" />
-          </div>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-1">
-          <span className="font-semibold text-lg tabular-nums text-[var(--text-primary)]">
-            <UsdcAmount amount={task.reward} className="text-base" />
-          </span>
-          <span className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider">
-            Bond: <UsdcAmount amount={task.bondAmount} className="text-[10px]" />
-          </span>
-          <span className="tabular-nums text-[11px] text-[var(--text-tertiary)] italic">
-            {formatDeadline(task.deadline)}
-          </span>
-        </div>
+      <div className="task-card-top">
+        <span className="task-card-title">
+          {task.descriptionHash || `Task #${task.id.toString()}`}
+        </span>
+        <span className="task-card-amount">${formatUsdc(task.reward)}</span>
       </div>
-    </Link>
+      <div className="task-card-meta">
+        <div className="status-indicator">
+          <span className="status-dot" data-status={statusName} />
+          <span className="status-text" data-status={statusName}>
+            {STATUS_LABELS[task.status] ?? "Unknown"}
+          </span>
+        </div>
+        <span className="task-card-poster">{truncateAddress(task.creator)}</span>
+      </div>
+    </div>
   );
 }

@@ -52,88 +52,111 @@ export function CreateTaskForm() {
 
   if (!address) {
     return (
-      <div className="flex flex-col items-center gap-3 border border-dashed border-[var(--border-primary)] py-12 text-center">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <div className="empty-state">
+        <svg className="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         </svg>
-        <p className="m-0 text-sm text-[var(--text-tertiary)]">Connect your wallet to create a task.</p>
+        <span className="empty-state-text">Connect wallet to create a task</span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-5 max-w-lg">
-      <FormField label="Reward (USDC)" hint="Minimum 1 USDC">
-        <input
-          type="text"
-          value={reward}
-          onChange={(e) => setReward(e.target.value)}
-          placeholder="10"
-          className="w-full border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
-        />
-      </FormField>
+    <div className="post-form">
+      <div className="form-group">
+        <label className="form-label">Reward (USDC)</label>
+        <div className="usdc-input-wrapper">
+          <input
+            type="text"
+            value={reward}
+            onChange={(e) => setReward(e.target.value)}
+            placeholder="10"
+            className="form-input"
+          />
+        </div>
+      </div>
 
-      <FormField label="Bond Required (USDC)" hint="Workers stake this as quality guarantee">
-        <input
-          type="text"
-          value={bond}
-          onChange={(e) => setBond(e.target.value)}
-          placeholder="5"
-          className="w-full border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
-        />
-      </FormField>
+      <div className="form-group">
+        <label className="form-label">Bond Required (USDC)</label>
+        <div className="usdc-input-wrapper">
+          <input
+            type="text"
+            value={bond}
+            onChange={(e) => setBond(e.target.value)}
+            placeholder="5"
+            className="form-input"
+          />
+        </div>
+        <span className="form-hint">Workers stake this as quality guarantee</span>
+      </div>
 
-      <FormField label="Description" hint="Task details or IPFS hash">
+      <div className="form-group">
+        <label className="form-label">Description</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe what needs to be done..."
-          rows={3}
-          className="w-full resize-none border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
+          className="form-textarea"
         />
-      </FormField>
+      </div>
 
-      <div className="flex gap-4">
-        <FormField label="Deadline (days)" className="flex-1">
+      <div className="form-row">
+        <div className="form-group">
+          <label className="form-label">Deadline (days)</label>
           <input
             type="number"
             value={deadlineDays}
             onChange={(e) => setDeadlineDays(e.target.value)}
             min="1"
-            className="w-full border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
+            className="form-input"
           />
-        </FormField>
-        <FormField label="Parent Task ID" hint="Optional" className="flex-1">
+        </div>
+        <div className="form-group">
+          <label className="form-label">Parent Task ID</label>
           <input
             type="text"
             value={parentTaskId}
             onChange={(e) => setParentTaskId(e.target.value)}
             placeholder="0"
-            className="w-full border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
+            className="form-input"
           />
-        </FormField>
+          <span className="form-hint">Optional</span>
+        </div>
       </div>
 
       {balance !== undefined && (
-        <div className="flex items-center gap-3 bg-[var(--bg-tertiary)] px-3 py-2 text-xs">
-          <span className="text-[var(--text-tertiary)]">Balance:</span>
-          <span className="tabular-nums font-mono text-[var(--text-secondary)]">{formatUsdc(balance)} USDC</span>
+        <div className="balance-bar">
+          <span>Balance:</span>
+          <span className="value">{formatUsdc(balance)} USDC</span>
           {allowance !== undefined && (
             <>
-              <span className="text-[var(--border-primary)]">|</span>
-              <span className="text-[var(--text-tertiary)]">Approved:</span>
-              <span className="tabular-nums font-mono text-[var(--text-secondary)]">{formatUsdc(allowance)} USDC</span>
+              <span className="separator">|</span>
+              <span>Approved:</span>
+              <span className="value">{formatUsdc(allowance)} USDC</span>
             </>
           )}
         </div>
       )}
 
-      {/* Step indicators */}
-      <div className="flex gap-4 items-center">
-        <StepIndicator step={1} active={step === "approve"} done={hasAllowance} label="Approve USDC" />
-        <div className="h-px flex-1 bg-[var(--border-primary)]" />
-        <StepIndicator step={2} active={step === "create"} done={create.isSuccess} label="Create Task" />
+      <div className="step-indicator">
+        <div className={`step-dot ${hasAllowance ? "done" : step === "approve" ? "active" : "pending"}`}>
+          {hasAllowance ? (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : "1"}
+        </div>
+        <span className={`step-label ${hasAllowance ? "done" : step === "approve" ? "active" : "pending"}`}>Approve</span>
+        <div className="step-line" />
+        <div className={`step-dot ${create.isSuccess ? "done" : step === "create" ? "active" : "pending"}`}>
+          {create.isSuccess ? (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : "2"}
+        </div>
+        <span className={`step-label ${create.isSuccess ? "done" : step === "create" ? "active" : "pending"}`}>Create</span>
       </div>
 
       {step === "approve" && !hasAllowance ? (
@@ -161,59 +184,6 @@ export function CreateTaskForm() {
           Create Task
         </TxButton>
       )}
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  hint,
-  children,
-  className = "",
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      <div className="flex items-baseline justify-between">
-        <label className="text-sm font-medium text-[var(--text-secondary)]">{label}</label>
-        {hint && <span className="text-[11px] text-[var(--text-tertiary)]">{hint}</span>}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function StepIndicator({ step, active, done, label }: { step: number; active: boolean; done: boolean; label: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        className={`flex h-6 w-6 items-center justify-center text-xs font-semibold ${
-          done
-            ? "bg-[var(--success-muted)] text-[var(--success)]"
-            : active
-              ? "bg-[var(--accent-muted)] text-[var(--text-primary)]"
-              : "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
-        }`}
-      >
-        {done ? (
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        ) : (
-          step
-        )}
-      </span>
-      <span
-        className={`text-xs font-medium ${
-          done ? "text-[var(--success)]" : active ? "text-[var(--accent)]" : "text-[var(--text-tertiary)]"
-        }`}
-      >
-        {label}
-      </span>
     </div>
   );
 }

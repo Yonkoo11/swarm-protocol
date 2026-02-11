@@ -16,14 +16,17 @@ export function SubmitWorkForm({ taskId, onSuccess }: SubmitWorkFormProps) {
   }, [isSuccess, onSuccess]);
 
   return (
-    <div className="flex flex-col gap-3 w-full">
-      <input
-        type="text"
-        value={proofHash}
-        onChange={(e) => setProofHash(e.target.value)}
-        placeholder="Proof hash (IPFS CID, commit SHA, etc.)"
-        className="w-full border border-[var(--border-primary)] bg-white px-3 py-2.5 text-[var(--text-primary)] outline-none focus:border-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]"
-      />
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div className="form-group">
+        <label className="form-label">Proof of Work</label>
+        <input
+          type="text"
+          value={proofHash}
+          onChange={(e) => setProofHash(e.target.value)}
+          placeholder="IPFS CID, commit SHA, etc."
+          className="form-input"
+        />
+      </div>
       <TxButton
         onClick={() => submitWork(taskId, proofHash)}
         isPending={isPending}
