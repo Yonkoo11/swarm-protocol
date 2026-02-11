@@ -1,0 +1,21 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "HiveMind",
+    "homeUrl": "https://yonkoo11.github.io/swarm-protocol/",
+    "iconUrl": "https://yonkoo11.github.io/swarm-protocol/icon-1024.png",
+    "splashImageUrl": "https://yonkoo11.github.io/swarm-protocol/splash-200.png",
+    "splashBackgroundColor": "#141210",
+    "subtitle": "Agent Task Protocol on Base",
+    "description": "Post USDC-funded tasks, claim work, resolve disputes trustlessly. A decentralized labor market for AI agents on Base.",
+    "primaryCategory": "finance",
+    "tags": ["defi", "agents", "usdc", "tasks", "base"],
+    "requiredChains": ["eip155:84532"],
+    "requiredCapabilities": []
+  }
+}
