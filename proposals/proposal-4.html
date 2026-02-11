@@ -1,0 +1,896 @@
+<!--
+  HiveMind - Design Proposal 4: "THE BLUEPRINT"
+  DNA Code: DNA-B-G-E-C-M (Blueprint, Grid, Engineering, Cool, Monospace)
+
+  UX Architecture:
+    Entry:      Architectural blueprint workspace (technical drawing aesthetic)
+    Exit:       Task completed, bond returned, USDC collected
+    Happy path: Blueprint > Browse Specs > Claim Task > Submit Work > Collect Payment
+    States:
+      - Empty:    Grid only, "NO SPECIFICATIONS FILED" centered
+      - Loading:  Drafting animation (line being drawn)
+      - Error:    Red dimension line with exclamation triangle
+      - Active:   Cyan lines at full intensity
+      - Muted:    Cyan at 30% opacity
+      - Warning:  Amber (#FFB800) dashed outline
+
+  Colors:
+    Background:  #0A1628 (deep blueprint blue)
+    Grid:        #132240 (subtle grid lines)
+    Primary:     #00D4FF (technical cyan)
+    Warning:     #FFB800 (amber caution)
+    Danger:      #FF3B3B (dispute red)
+    Success:     #00E676 (approved green)
+    Surface:     #0E1E36 (card/panel fill)
+    Text:        #E8F0FC (blueprint white)
+    Muted:       #3A5278 (dimension text)
+
+  Fonts:
+    Headlines:   Space Mono (monospace, technical)
+    Body:        IBM Plex Sans (clean, readable)
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HiveMind - The Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A1628;
+    --bg-surface: #0E1E36;
+    --grid: #132240;
+    --cyan: #00D4FF;
+    --amber: #FFB800;
+    --red: #FF3B3B;
+    --green: #00E676;
+    --text: #E8F0FC;
+    --muted: #3A5278;
+    --dim: #1A3055;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 20px 20px;
+    position: relative;
+  }
+
+  /* --- Typography --- */
+  h1, h2, h3, h4, .mono { font-family: 'Space Mono', monospace; }
+  .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-family: 'Space Mono', monospace; }
+  .value { font-family: 'Space Mono', monospace; color: var(--cyan); }
+  .unit { font-size: 0.7em; color: var(--muted); margin-left: 2px; }
+
+  /* --- Layout --- */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* --- Corner Tick Marks (card decoration) --- */
+  .tick-card {
+    position: relative;
+    background: var(--bg-surface);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .tick-card::before, .tick-card::after,
+  .tick-card > .tick-bl::before, .tick-card > .tick-br::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--cyan);
+    border-style: solid;
+    opacity: 0.5;
+  }
+  .tick-card::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+  .tick-card::after { top: 0; right: 0; border-width: 1px 1px 0 0; }
+  .tick-card > .tick-bl::before { bottom: 0; left: 0; border-width: 0 0 1px 1px; top: auto; }
+  .tick-card > .tick-br::before { bottom: 0; right: 0; border-width: 0 1px 1px 0; top: auto; }
+
+  /* Simplified corner ticks using box-shadow trick */
+  .ticked {
+    position: relative;
+    background: var(--bg-surface);
+    padding: 20px;
+    outline: 1px solid transparent;
+  }
+  .ticked::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 1px dashed var(--dim);
+    opacity: 0.4;
+  }
+  .ticked::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    background:
+      /* top-left */
+      linear-gradient(var(--cyan), var(--cyan)) 0 0 / 14px 1px no-repeat,
+      linear-gradient(var(--cyan), var(--cyan)) 0 0 / 1px 14px no-repeat,
+      /* top-right */
+      linear-gradient(var(--cyan), var(--cyan)) 100% 0 / 14px 1px no-repeat,
+      linear-gradient(var(--cyan), var(--cyan)) 100% 0 / 1px 14px no-repeat,
+      /* bottom-left */
+      linear-gradient(var(--cyan), var(--cyan)) 0 100% / 14px 1px no-repeat,
+      linear-gradient(var(--cyan), var(--cyan)) 0 100% / 1px 14px no-repeat,
+      /* bottom-right */
+      linear-gradient(var(--cyan), var(--cyan)) 100% 100% / 14px 1px no-repeat,
+      linear-gradient(var(--cyan), var(--cyan)) 100% 100% / 1px 14px no-repeat;
+    opacity: 0.6;
+  }
+
+  /* --- Title Block (section headers) --- */
+  .title-block {
+    display: inline-flex;
+    align-items: stretch;
+    border: 1px solid var(--cyan);
+    margin-bottom: 24px;
+    font-family: 'Space Mono', monospace;
+  }
+  .title-block .tb-num {
+    background: var(--cyan);
+    color: var(--bg);
+    padding: 6px 12px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+  .title-block .tb-label {
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    color: var(--text);
+  }
+  .title-block .tb-meta {
+    border-left: 1px solid var(--dim);
+    padding: 6px 12px;
+    font-size: 0.65rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+  }
+
+  /* --- Buttons --- */
+  .btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 8px 20px;
+    cursor: pointer;
+    border: 1px solid var(--cyan);
+    background: transparent;
+    color: var(--cyan);
+    transition: all 0.2s;
+    position: relative;
+  }
+  .btn:hover { background: rgba(0, 212, 255, 0.1); }
+  .btn-primary {
+    background: linear-gradient(180deg, #0E3A5C 0%, #0A2440 100%);
+    border: 1px solid var(--cyan);
+    box-shadow: inset 0 1px 0 rgba(0,212,255,0.2), inset 0 -2px 0 rgba(0,0,0,0.3);
+    color: var(--cyan);
+  }
+  .btn-primary:hover { background: linear-gradient(180deg, #12476E 0%, #0E3050 100%); }
+  .btn-amber { border-color: var(--amber); color: var(--amber); }
+  .btn-amber:hover { background: rgba(255,184,0,0.1); }
+  .btn-red { border-color: var(--red); color: var(--red); }
+  .btn-red:hover { background: rgba(255,59,59,0.1); }
+  .btn-sm { padding: 4px 12px; font-size: 0.65rem; }
+
+  /* --- Status Tags --- */
+  .status {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    flex-shrink: 0;
+  }
+  .status-open { color: var(--cyan); border: 1px dashed var(--cyan); }
+  .status-open::before { border-color: var(--cyan); background: transparent; }
+  .status-active { color: var(--green); border: 1px solid var(--green); }
+  .status-active::before { border-color: var(--green); background: var(--green); }
+  .status-review { color: var(--amber); border: 1px solid var(--amber); }
+  .status-review::before { border-color: var(--amber); background: var(--amber); }
+  .status-disputed { color: var(--red); border: 1px solid var(--red); }
+  .status-disputed::before {
+    border-color: var(--red);
+    background: transparent;
+    border-radius: 0;
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 8px solid var(--red);
+    border-top: none;
+  }
+  .status-complete { color: var(--muted); border: 1px solid var(--muted); }
+  .status-complete::before { border-color: var(--muted); background: var(--muted); }
+
+  /* --- Crosshair marker --- */
+  .crosshair {
+    display: inline-block;
+    width: 16px; height: 16px;
+    position: relative;
+  }
+  .crosshair::before, .crosshair::after {
+    content: '';
+    position: absolute;
+    background: var(--cyan);
+  }
+  .crosshair::before { width: 1px; height: 100%; left: 50%; top: 0; }
+  .crosshair::after { width: 100%; height: 1px; top: 50%; left: 0; }
+
+  /* --- Dimension line --- */
+  .dim-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.65rem;
+    font-family: 'Space Mono', monospace;
+  }
+  .dim-line .line { flex: 1; height: 0; border-top: 1px dashed var(--dim); }
+  .dim-line .endpoint { width: 6px; height: 6px; border: 1px solid var(--muted); border-radius: 50%; }
+
+  /* --- Form elements --- */
+  .input, .textarea, .select {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.85rem;
+    background: var(--bg);
+    border: 1px dashed var(--dim);
+    color: var(--text);
+    padding: 10px 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input:focus, .textarea:focus { border-color: var(--cyan); border-style: solid; }
+  .textarea { resize: vertical; min-height: 80px; }
+
+  /* --- Grid helpers --- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .flex-between { display: flex; justify-content: space-between; align-items: center; }
+  .flex-gap { display: flex; gap: 12px; align-items: center; }
+
+  /* --- Specific components --- */
+  .nav-bar {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--dim);
+    position: sticky;
+    top: 0;
+    background: rgba(10,22,40,0.95);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-hex {
+    width: 28px; height: 28px;
+    border: 2px solid var(--cyan);
+    transform: rotate(45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .logo-hex::after {
+    content: '';
+    width: 8px; height: 8px;
+    background: var(--cyan);
+    transform: rotate(-45deg);
+  }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active {
+    color: var(--cyan);
+    border-color: var(--dim);
+    background: rgba(0,212,255,0.04);
+  }
+  .network-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--green);
+    border: 1px solid rgba(0,230,118,0.3);
+    padding: 3px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .network-pill::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 20px 16px;
+  }
+  .stat-card .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--cyan);
+    line-height: 1.2;
+  }
+  .stat-card .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .stat-card .stat-delta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--green);
+    margin-top: 4px;
+  }
+
+  .task-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 100px 100px 90px 130px 80px;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px dashed var(--dim);
+    font-size: 0.82rem;
+    transition: background 0.15s;
+  }
+  .task-row:hover { background: rgba(0,212,255,0.03); }
+  .task-row .task-id { font-family: 'Space Mono', monospace; color: var(--muted); font-size: 0.75rem; }
+  .task-row .task-title { font-weight: 500; }
+  .task-row .task-reward { font-family: 'Space Mono', monospace; color: var(--cyan); font-weight: 700; }
+  .task-row .task-bond { font-family: 'Space Mono', monospace; color: var(--amber); font-size: 0.8rem; }
+  .task-row .task-deadline { font-family: 'Space Mono', monospace; color: var(--muted); font-size: 0.75rem; }
+  .task-row .task-creator { font-family: 'Space Mono', monospace; color: var(--muted); font-size: 0.7rem; }
+  .task-header {
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--dim);
+  }
+  .task-header:hover { background: transparent; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1px;
+    background: var(--dim);
+    font-size: 0.82rem;
+  }
+  .detail-grid dt {
+    background: rgba(10,22,40,0.8);
+    padding: 10px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .detail-grid dd {
+    background: var(--bg-surface);
+    padding: 10px 14px;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .juror-vote {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-left: 3px solid var(--dim);
+  }
+  .juror-vote .juror-addr { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); min-width: 120px; }
+  .vote-approve { border-left-color: var(--green); }
+  .vote-approve .verdict { color: var(--green); }
+  .vote-reject { border-left-color: var(--red); }
+  .vote-reject .verdict { color: var(--red); }
+  .vote-pending { border-left-color: var(--dim); }
+  .vote-pending .verdict { color: var(--muted); }
+  .verdict { font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--dim);
+    position: relative;
+    margin-top: 8px;
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: var(--cyan);
+    transition: width 0.3s;
+  }
+
+  section { padding: 40px 0; }
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .section-divider .line { flex: 1; border-top: 1px dashed var(--dim); }
+
+  .footer {
+    border-top: 1px solid var(--dim);
+    padding: 32px 0;
+    margin-top: 40px;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  .footer a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<nav class="nav-bar">
+  <div class="container flex-between">
+    <div class="flex-gap">
+      <div class="logo">
+        <div class="logo-hex"></div>
+        HIVEMIND
+      </div>
+      <span style="color:var(--dim); margin: 0 8px;">|</span>
+      <ul class="nav-links">
+        <li><a href="#" class="active">Tasks</a></li>
+        <li><a href="#">Create</a></li>
+        <li><a href="#">Disputes</a></li>
+        <li><a href="#">Staking</a></li>
+        <li><a href="#">Docs</a></li>
+      </ul>
+    </div>
+    <div class="flex-gap">
+      <div class="network-pill">Base Mainnet</div>
+      <button class="btn btn-primary btn-sm" style="white-space:nowrap;">0x7a2B...f39E</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ STATS DASHBOARD ============ -->
+<section style="padding:32px 0 16px;">
+  <div class="container">
+    <div class="grid-4">
+      <div class="ticked stat-card">
+        <div class="stat-value">1,247</div>
+        <div class="stat-label">Total Tasks</div>
+        <div class="stat-delta">+38 (24h)</div>
+      </div>
+      <div class="ticked stat-card">
+        <div class="stat-value">$842.5K<span class="unit">USDC</span></div>
+        <div class="stat-label">Total Value Locked</div>
+        <div class="stat-delta">+$12.4K (24h)</div>
+      </div>
+      <div class="ticked stat-card">
+        <div class="stat-value">312</div>
+        <div class="stat-label">Active Jurors</div>
+        <div class="stat-delta">+7 (7d)</div>
+      </div>
+      <div class="ticked stat-card">
+        <div class="stat-value">4.20<span class="unit">%</span></div>
+        <div class="stat-label">Dispute Rate</div>
+        <div class="stat-delta" style="color:var(--amber);">+0.3% (7d)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TASK LIST ============ -->
+<section style="padding:16px 0 0;">
+  <div class="container">
+    <div class="title-block">
+      <div class="tb-num">SEC-01</div>
+      <div class="tb-label">Active Task Registry</div>
+      <div class="tb-meta">SHOWING 5 OF 1,247 // PAGE 1</div>
+    </div>
+
+    <div class="ticked" style="padding:0; overflow:hidden;">
+      <!-- Header -->
+      <div class="task-row task-header">
+        <span>SPEC #</span>
+        <span>SPECIFICATION</span>
+        <span>STATUS</span>
+        <span>REWARD</span>
+        <span>BOND</span>
+        <span>DEADLINE</span>
+        <span>ORIGIN</span>
+      </div>
+      <!-- Task rows -->
+      <div class="task-row">
+        <span class="task-id">HM-1042</span>
+        <span class="task-title">Solidity audit for yield aggregator vault (3 contracts)</span>
+        <span><span class="status status-open">Open</span></span>
+        <span class="task-reward">2,500.00</span>
+        <span class="task-bond">250.00</span>
+        <span class="task-deadline">2026-02-15</span>
+        <span class="task-creator">0x4f2A...c81D</span>
+      </div>
+      <div class="task-row" style="background:rgba(0,212,255,0.03);">
+        <span class="task-id">HM-1041</span>
+        <span class="task-title">React dashboard for on-chain analytics (Dune API)</span>
+        <span><span class="status status-active">Claimed</span></span>
+        <span class="task-reward">1,800.00</span>
+        <span class="task-bond">180.00</span>
+        <span class="task-deadline">2026-02-20</span>
+        <span class="task-creator">0x8bE1...9a72</span>
+      </div>
+      <div class="task-row">
+        <span class="task-id">HM-1039</span>
+        <span class="task-title">Design brand identity and token icons for DeFi protocol</span>
+        <span><span class="status status-review">Review</span></span>
+        <span class="task-reward">800.00</span>
+        <span class="task-bond">80.00</span>
+        <span class="task-deadline">2026-02-10</span>
+        <span class="task-creator">0xd31F...2bA5</span>
+      </div>
+      <div class="task-row">
+        <span class="task-id">HM-1037</span>
+        <span class="task-title">Subgraph indexer for NFT marketplace events (TheGraph)</span>
+        <span><span class="status status-disputed">Dispute</span></span>
+        <span class="task-reward">1,200.00</span>
+        <span class="task-bond">120.00</span>
+        <span class="task-deadline">2026-02-08</span>
+        <span class="task-creator">0x1cAe...f047</span>
+      </div>
+      <div class="task-row">
+        <span class="task-id">HM-1034</span>
+        <span class="task-title">Write technical docs for cross-chain bridge integration</span>
+        <span><span class="status status-complete">Done</span></span>
+        <span class="task-reward">600.00</span>
+        <span class="task-bond">60.00</span>
+        <span class="task-deadline">2026-02-05</span>
+        <span class="task-creator">0x92bF...3e16</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DETAIL VIEW (EXPANDED) ============ -->
+<section>
+  <div class="container">
+    <div class="title-block">
+      <div class="tb-num">SEC-02</div>
+      <div class="tb-label">Task Detail: HM-1042</div>
+      <div class="tb-meta">STATUS: OPEN // CREATED 2026-02-06T14:32:07Z</div>
+    </div>
+
+    <div class="ticked" style="padding:0; overflow:hidden;">
+      <div style="padding:24px; border-bottom: 1px dashed var(--dim);">
+        <div class="flex-between" style="margin-bottom:16px;">
+          <div>
+            <span class="label">SPECIFICATION #HM-1042</span>
+            <h3 style="margin-top:4px; font-size:1.1rem; font-weight:700;">Solidity audit for yield aggregator vault (3 contracts)</h3>
+          </div>
+          <div class="flex-gap">
+            <span class="status status-open">Open</span>
+            <button class="btn btn-primary">Claim Task // Stake 250.00 USDC</button>
+          </div>
+        </div>
+        <p style="color:var(--muted); font-size:0.85rem; max-width:700px;">
+          Full security audit of three Solidity contracts (Vault.sol, Strategy.sol, Router.sol) deployed on Base.
+          Expected deliverables include a written report with severity classifications, PoC exploits for critical findings, and gas optimization recommendations.
+        </p>
+      </div>
+
+      <dl class="detail-grid">
+        <dt>Reward</dt>
+        <dd><span class="value" style="font-size:1rem; font-weight:700;">2,500.00 <span class="unit">USDC</span></span></dd>
+
+        <dt>Bond Req.</dt>
+        <dd><span class="value" style="color:var(--amber);">250.00 <span class="unit">USDC</span></span> <span style="color:var(--muted); font-size:0.75rem; margin-left:8px;">(10.00% of reward)</span></dd>
+
+        <dt>Creator</dt>
+        <dd><span class="mono" style="font-size:0.8rem; color:var(--cyan);">0x4f2A8c1B930Ee7d12bF5a0C3D6fE8942c81D</span></dd>
+
+        <dt>Deadline</dt>
+        <dd><span class="mono" style="font-size:0.85rem;">2026-02-15T23:59:59Z</span> <span style="color:var(--muted); font-size:0.75rem; margin-left:8px;">(6d 18h remaining)</span></dd>
+
+        <dt>Category</dt>
+        <dd><span class="mono" style="font-size:0.8rem;">SECURITY-AUDIT</span></dd>
+
+        <dt>Difficulty</dt>
+        <dd>
+          <span class="mono" style="font-size:0.8rem;">ADVANCED</span>
+          <div class="progress-bar" style="width:120px; display:inline-block; vertical-align:middle; margin-left:12px;">
+            <div class="fill" style="width:75%;"></div>
+          </div>
+          <span style="color:var(--muted); font-size:0.7rem; margin-left:8px;">3 / 4</span>
+        </dd>
+
+        <dt>Claims</dt>
+        <dd><span class="mono" style="font-size:0.85rem;">0</span> <span style="color:var(--muted); font-size:0.75rem; margin-left:8px;">of 1 max</span></dd>
+
+        <dt>Escrow TX</dt>
+        <dd><span class="mono" style="font-size:0.75rem; color:var(--cyan);">0xa4b8c2d1...9f3e7a12</span> <span style="color:var(--green); font-size:0.65rem; margin-left:8px;">CONFIRMED // BLOCK 18,294,107</span></dd>
+      </dl>
+
+      <!-- Dimension line decoration -->
+      <div style="padding:12px 20px;">
+        <div class="dim-line">
+          <div class="endpoint"></div>
+          <div class="line"></div>
+          <span>ESCROW: 2,500.00 USDC LOCKED</span>
+          <div class="line"></div>
+          <div class="endpoint"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CREATE TASK ============ -->
+<section>
+  <div class="container">
+    <div class="title-block">
+      <div class="tb-num">SEC-03</div>
+      <div class="tb-label">File New Specification</div>
+      <div class="tb-meta">REQUIRES USDC APPROVAL</div>
+    </div>
+
+    <div class="ticked" style="padding:28px;">
+      <div class="grid-2" style="margin-bottom:20px;">
+        <div>
+          <label class="label" style="display:block; margin-bottom:6px;">Specification Title</label>
+          <input class="input" type="text" placeholder="e.g. Smart contract audit for lending protocol" />
+        </div>
+        <div>
+          <label class="label" style="display:block; margin-bottom:6px;">Category</label>
+          <select class="input select">
+            <option>SECURITY-AUDIT</option>
+            <option>FRONTEND-DEV</option>
+            <option>BACKEND-DEV</option>
+            <option>DESIGN</option>
+            <option>DOCUMENTATION</option>
+            <option>DATA-ANALYSIS</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <label class="label" style="display:block; margin-bottom:6px;">Description</label>
+        <textarea class="input textarea" placeholder="Detailed task requirements, deliverables, and acceptance criteria..."></textarea>
+      </div>
+
+      <div class="grid-3" style="margin-bottom:20px;">
+        <div>
+          <label class="label" style="display:block; margin-bottom:6px;">Reward Amount <span style="color:var(--cyan);">(USDC)</span></label>
+          <input class="input" type="text" placeholder="0.00" />
+        </div>
+        <div>
+          <label class="label" style="display:block; margin-bottom:6px;">Bond Percentage</label>
+          <input class="input" type="text" placeholder="10.00" value="10.00" />
+          <span class="label" style="margin-top:4px; display:block;">DEFAULT: 10.00% OF REWARD</span>
+        </div>
+        <div>
+          <label class="label" style="display:block; margin-bottom:6px;">Deadline</label>
+          <input class="input" type="text" placeholder="YYYY-MM-DDThh:mm:ssZ" />
+        </div>
+      </div>
+
+      <div class="dim-line" style="margin-bottom:20px;">
+        <div class="endpoint"></div>
+        <div class="line"></div>
+        <span>TOTAL DEPOSIT = REWARD + 2.50% PROTOCOL FEE</span>
+        <div class="line"></div>
+        <div class="endpoint"></div>
+      </div>
+
+      <div class="flex-between">
+        <span class="label">ESTIMATED GAS: ~0.0012 ETH (BASE L2)</span>
+        <div class="flex-gap">
+          <button class="btn">Cancel</button>
+          <button class="btn btn-primary">Approve USDC + Submit Spec</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DISPUTE SECTION ============ -->
+<section>
+  <div class="container">
+    <div class="title-block">
+      <div class="tb-num">SEC-04</div>
+      <div class="tb-label">Active Dispute: HM-1037</div>
+      <div class="tb-meta">DISPUTE #D-0089 // FILED 2026-02-08T09:14:22Z</div>
+    </div>
+
+    <div class="ticked" style="padding:0; overflow:hidden;">
+      <div style="padding:24px; border-bottom: 1px dashed var(--dim);">
+        <div class="flex-between" style="margin-bottom:12px;">
+          <div>
+            <h3 style="font-size:1rem; font-weight:700;">Subgraph indexer for NFT marketplace events (TheGraph)</h3>
+            <span class="label" style="margin-top:4px; display:block;">DISPUTE REASON: DELIVERABLE DOES NOT MATCH SPEC -- MISSING EVENT HANDLERS FOR TRANSFER AND APPROVAL</span>
+          </div>
+          <span class="status status-disputed">Dispute Active</span>
+        </div>
+
+        <div class="grid-3" style="margin-top:16px;">
+          <div>
+            <span class="label">Creator (Plaintiff)</span>
+            <div class="mono" style="font-size:0.8rem; color:var(--cyan); margin-top:4px;">0x1cAe...f047</div>
+          </div>
+          <div>
+            <span class="label">Worker (Defendant)</span>
+            <div class="mono" style="font-size:0.8rem; color:var(--amber); margin-top:4px;">0xb7F3...82aD</div>
+          </div>
+          <div>
+            <span class="label">Disputed Amount</span>
+            <div class="mono" style="font-size:0.8rem; color:var(--red); margin-top:4px;">1,200.00 <span class="unit">USDC</span> + 120.00 <span class="unit">BOND</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Juror Panel -->
+      <div style="padding:20px 24px;">
+        <div class="flex-between" style="margin-bottom:16px;">
+          <span class="label">JUROR PANEL -- 5 ASSIGNED // 3 VOTED // QUORUM: 3 OF 5</span>
+          <span class="label" style="color:var(--amber);">VOTING CLOSES: 2026-02-10T09:14:22Z (47h 32m)</span>
+        </div>
+
+        <div class="juror-vote vote-approve" style="margin-bottom:6px;">
+          <span class="juror-addr">0x55aF...c912</span>
+          <span class="verdict">Approve (Creator)</span>
+          <span style="color:var(--muted); font-size:0.7rem; margin-left:auto; font-family:'Space Mono',monospace;">VOTED 2026-02-08T11:02:44Z</span>
+        </div>
+        <div class="juror-vote vote-reject" style="margin-bottom:6px;">
+          <span class="juror-addr">0x3Ed1...7b4F</span>
+          <span class="verdict">Reject (Worker)</span>
+          <span style="color:var(--muted); font-size:0.7rem; margin-left:auto; font-family:'Space Mono',monospace;">VOTED 2026-02-08T12:18:09Z</span>
+        </div>
+        <div class="juror-vote vote-approve" style="margin-bottom:6px;">
+          <span class="juror-addr">0xaC29...5eD8</span>
+          <span class="verdict">Approve (Creator)</span>
+          <span style="color:var(--muted); font-size:0.7rem; margin-left:auto; font-family:'Space Mono',monospace;">VOTED 2026-02-08T14:55:31Z</span>
+        </div>
+        <div class="juror-vote vote-pending" style="margin-bottom:6px;">
+          <span class="juror-addr">0x7dB6...1a3C</span>
+          <span class="verdict">Pending</span>
+          <span style="color:var(--muted); font-size:0.7rem; margin-left:auto; font-family:'Space Mono',monospace;">--</span>
+        </div>
+        <div class="juror-vote vote-pending" style="margin-bottom:6px;">
+          <span class="juror-addr">0xe1F4...8c07</span>
+          <span class="verdict">Pending</span>
+          <span style="color:var(--muted); font-size:0.7rem; margin-left:auto; font-family:'Space Mono',monospace;">--</span>
+        </div>
+
+        <!-- Vote tally -->
+        <div style="margin-top:20px; padding-top:16px; border-top:1px dashed var(--dim);">
+          <div class="flex-between" style="margin-bottom:8px;">
+            <span class="label">CURRENT TALLY</span>
+            <span class="label" style="color:var(--green);">QUORUM REACHED -- PRELIMINARY: CREATOR WINS</span>
+          </div>
+          <div class="grid-2" style="max-width:400px;">
+            <div>
+              <div class="flex-gap">
+                <span class="mono" style="color:var(--green); font-size:0.85rem; font-weight:700;">2</span>
+                <span class="label">Approve (Creator)</span>
+              </div>
+              <div class="progress-bar" style="margin-top:6px;">
+                <div class="fill" style="width:66%; background:var(--green);"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex-gap">
+                <span class="mono" style="color:var(--red); font-size:0.85rem; font-weight:700;">1</span>
+                <span class="label">Reject (Worker)</span>
+              </div>
+              <div class="progress-bar" style="margin-top:6px;">
+                <div class="fill" style="width:33%; background:var(--red);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dim-line" style="margin-top:20px;">
+          <div class="endpoint"></div>
+          <div class="line"></div>
+          <span>IF CREATOR WINS: 1,200.00 USDC REFUNDED + 120.00 BOND SLASHED</span>
+          <div class="line"></div>
+          <div class="endpoint"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <div class="flex-between" style="margin-bottom:16px;">
+      <div class="logo" style="font-size:0.85rem;">
+        <div class="logo-hex" style="width:20px; height:20px;"></div>
+        HIVEMIND
+      </div>
+      <div class="flex-gap" style="gap:20px;">
+        <a href="#" style="color:var(--muted); text-decoration:none; font-size:0.7rem; font-family:'Space Mono',monospace;">GITHUB</a>
+        <a href="#" style="color:var(--muted); text-decoration:none; font-size:0.7rem; font-family:'Space Mono',monospace;">DOCS</a>
+        <a href="#" style="color:var(--muted); text-decoration:none; font-size:0.7rem; font-family:'Space Mono',monospace;">DISCORD</a>
+        <a href="#" style="color:var(--muted); text-decoration:none; font-size:0.7rem; font-family:'Space Mono',monospace;">AUDIT</a>
+      </div>
+    </div>
+    <div class="dim-line" style="margin-bottom:16px;">
+      <div class="endpoint"></div>
+      <div class="line"></div>
+      <span>BASE MAINNET</span>
+      <div class="line"></div>
+      <div class="endpoint"></div>
+    </div>
+    <div class="grid-3" style="color:var(--muted); font-family:'Space Mono',monospace; font-size:0.65rem;">
+      <div>
+        <div style="margin-bottom:4px;">CORE CONTRACT</div>
+        <div style="color:var(--cyan);">0x7B2f...4e8A</div>
+      </div>
+      <div>
+        <div style="margin-bottom:4px;">DISPUTE RESOLVER</div>
+        <div style="color:var(--cyan);">0x3dC1...b92F</div>
+      </div>
+      <div>
+        <div style="margin-bottom:4px;">JUROR REGISTRY</div>
+        <div style="color:var(--cyan);">0xaE47...6d1C</div>
+      </div>
+    </div>
+    <div style="margin-top:20px; color:var(--muted); font-family:'Space Mono',monospace; font-size:0.6rem; text-align:center;">
+      HIVEMIND PROTOCOL v0.4.0 // PROPOSAL 4: THE BLUEPRINT // BUILT ON BASE // 2026
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
