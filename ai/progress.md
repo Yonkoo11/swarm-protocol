@@ -27,12 +27,12 @@
   - Success formula: Simple UX + Social Virality + Financial Incentive
   - Every action should cast to feed, leaderboards for status, pre-filled share
 
-## What User Must Do Manually
-1. Go to build.base.org → generate accountAssociation (domain verification)
-2. Paste header/payload/signature into `frontend/public/.well-known/farcaster.json`
-3. Rebuild + redeploy (`pnpm build && npx gh-pages -d frontend/dist --dotfiles`)
-4. Validate with Base Build Preview tool
-5. Publish by posting URL on Warpcast
+## Miniapp Registration COMPLETE
+- accountAssociation generated via Warpcast Manifests tool (FID: 921562)
+- Root domain repo created: github.com/Yonkoo11/yonkoo11.github.io
+- `.well-known/farcaster.json` serving at root domain (200 OK, signature verified)
+- Domain verified, signature verified, miniapp config valid on Warpcast
+- To publish: cast `https://yonkoo11.github.io/swarm-protocol/` on Warpcast
 
 ## What's Next
 1. Follow up with Dan Romero with live link

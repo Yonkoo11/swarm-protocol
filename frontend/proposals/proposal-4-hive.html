@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<!--
+  HiveMind - Design Proposal 4: "LIVING HIVE"
+  DNA Code: DNA-GEO-WARM-BOLD-ORGANIC-ALIVE
+
+  Concept:
+  ========
+  The miniapp feels ALIVE - a living organism, a thriving hive.
+  Hexagonal geometry is STRUCTURAL, not decorative.
+  Amber/honey (#E8A317) is EARNED - it appears only where value flows.
+  Deep warm blacks and cream create a space that breathes warmth.
+  Every pixel is intentional. Every animation serves a purpose.
+
+  The amber = USDC = value. Wherever money moves, amber glows.
+  Hexagons = collective intelligence. The swarm's geometry.
+  Warmth = this is alive, not a cold protocol dashboard.
+
+  Tab Architecture:
+  - Feed: task stream with status-colored left borders
+  - Post: focused creation form, amber CTA
+  - Mine: earnings dashboard + claimed tasks
+  - Jury: active disputes + juror stake panel
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMind - Living Hive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       RESET + ROOT
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-deep: #121110;
+      --bg: #1a1714;
+      --bg-elevated: #231f1a;
+      --bg-surface: #2a2520;
+      --bg-hover: #332d27;
+      --border: #3a332c;
+      --border-subtle: #2e2822;
+
+      --amber: #E8A317;
+      --amber-soft: #D4941A;
+      --amber-dim: rgba(232, 163, 23, 0.12);
+      --amber-glow: rgba(232, 163, 23, 0.25);
+      --amber-bright: #F0B840;
+
+      --cream: #F5E6CC;
+      --cream-secondary: #BFB099;
+      --cream-tertiary: #8A7E6E;
+
+      --sage: #7A8B6F;
+      --sage-dim: rgba(122, 139, 111, 0.15);
+      --sage-bright: #94A787;
+
+      --warm-red: #C4543A;
+      --warm-red-dim: rgba(196, 84, 58, 0.15);
+
+      --font-display: 'Sora', sans-serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    html {
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: #0e0d0c;
+      color: var(--cream);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* ============================================
+       APP SHELL
+       ============================================ */
+    .app {
+      width: 424px;
+      height: 695px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow:
+        0 0 0 1px rgba(232, 163, 23, 0.06),
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    .header {
+      position: relative;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 10;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Honeycomb mesh - CSS only, animated */
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(232, 163, 23, 0.03) 0%, transparent 50%),
+        linear-gradient(to bottom, var(--bg) 0%, rgba(26, 23, 20, 0.95) 100%);
+      z-index: -1;
+    }
+
+    .honeycomb-mesh {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: -1;
+      opacity: 0.035;
+    }
+
+    .honeycomb-mesh svg {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      width: calc(100% + 40px);
+      height: calc(100% + 40px);
+      animation: meshDrift 20s ease-in-out infinite;
+    }
+
+    @keyframes meshDrift {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(3px, -2px); }
+      50% { transform: translate(-2px, 3px); }
+      75% { transform: translate(2px, 1px); }
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-logo {
+      width: 28px;
+      height: 28px;
+      position: relative;
+    }
+
+    .header-logo svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .header-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+      color: var(--cream);
+    }
+
+    .wallet-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px 5px 8px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11.5px;
+      color: var(--cream-secondary);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .wallet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--sage);
+      box-shadow: 0 0 6px rgba(122, 139, 111, 0.4);
+    }
+
+    /* ============================================
+       STATS RIBBON
+       ============================================ */
+    .stats-ribbon {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      gap: 0;
+    }
+
+    .stat-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+    }
+
+    .stat-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 14px;
+      /* Hex separator via clip-path */
+      background: var(--border);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      opacity: 0.4;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--cream);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
+    }
+
+    .stat-value.amber {
+      color: var(--amber);
+    }
+
+    .stat-label {
+      font-size: 9.5px;
+      font-weight: 500;
+      color: var(--cream-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* ============================================
+       CONTENT AREA
+       ============================================ */
+    .content-area {
+      position: relative;
+      height: calc(695px - 56px - 48px - 56px); /* header + stats + tabs */
+      overflow: hidden;
+    }
+
+    .tab-content {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.35s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
+      pointer-events: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-content::-webkit-scrollbar { display: none; }
+
+    .tab-content.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .tab-content.exit-left {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+
+    /* ============================================
+       FEED TAB
+       ============================================ */
+    .feed-list {
+      padding: 8px 0;
+    }
+
+    .task-card {
+      position: relative;
+      padding: 14px 20px 14px 20px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border-bottom: 1px solid rgba(46, 40, 34, 0.5);
+    }
+
+    .task-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      bottom: 12px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+      transition: width 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .task-card[data-status="open"]::before {
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber-dim);
+    }
+
+    .task-card[data-status="claimed"]::before {
+      background: var(--sage);
+      box-shadow: 0 0 8px var(--sage-dim);
+    }
+
+    .task-card[data-status="disputed"]::before {
+      background: var(--warm-red);
+      box-shadow: 0 0 8px var(--warm-red-dim);
+    }
+
+    .task-card[data-status="completed"]::before {
+      background: var(--cream-tertiary);
+      opacity: 0.5;
+    }
+
+    .task-card:active {
+      background: var(--bg-elevated);
+    }
+
+    .task-card:active::before {
+      width: 4px;
+    }
+
+    .task-row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .task-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--cream);
+      line-height: 1.35;
+      flex: 1;
+      padding-right: 12px;
+      letter-spacing: -0.1px;
+    }
+
+    .task-bounty {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--amber);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
+      text-shadow: 0 0 20px rgba(232, 163, 23, 0.2);
+    }
+
+    .task-row-bottom {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-meta {
+      font-size: 11.5px;
+      color: var(--cream-tertiary);
+      font-weight: 400;
+    }
+
+    .task-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px 2px 6px;
+      border-radius: 20px;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .task-status[data-status="open"] {
+      background: var(--amber-dim);
+      color: var(--amber);
+    }
+
+    .task-status[data-status="claimed"] {
+      background: var(--sage-dim);
+      color: var(--sage-bright);
+    }
+
+    .task-status[data-status="disputed"] {
+      background: var(--warm-red-dim);
+      color: var(--warm-red);
+    }
+
+    .task-status[data-status="completed"] {
+      background: rgba(138, 126, 110, 0.12);
+      color: var(--cream-tertiary);
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .status-dot.open {
+      background: var(--amber);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    .status-dot.claimed {
+      background: var(--sage);
+    }
+
+    .status-dot.disputed {
+      background: var(--warm-red);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    .status-dot.completed {
+      background: var(--cream-tertiary);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .task-tags {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .task-tag {
+      padding: 2px 7px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--cream-tertiary);
+      background: rgba(138, 126, 110, 0.08);
+      border: 1px solid rgba(138, 126, 110, 0.1);
+      border-radius: 4px;
+      letter-spacing: 0.2px;
+    }
+
+    /* ============================================
+       POST TAB
+       ============================================ */
+    .post-content {
+      padding: 20px;
+    }
+
+    .post-header {
+      margin-bottom: 24px;
+    }
+
+    .post-header h2 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--cream);
+      letter-spacing: -0.4px;
+      margin-bottom: 4px;
+    }
+
+    .post-header p {
+      font-size: 12.5px;
+      color: var(--cream-tertiary);
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--cream-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 13px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: var(--cream-tertiary);
+      opacity: 0.7;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--amber-soft);
+      box-shadow: 0 0 0 3px var(--amber-dim);
+    }
+
+    .form-textarea {
+      resize: none;
+      height: 80px;
+      line-height: 1.5;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .bounty-input-wrap {
+      position: relative;
+    }
+
+    .bounty-input-wrap .form-input {
+      padding-left: 50px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
+    }
+
+    .bounty-prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--amber);
+    }
+
+    .btn-post {
+      width: 100%;
+      height: 46px;
+      background: var(--amber);
+      border: none;
+      border-radius: 8px;
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.2s ease;
+      margin-top: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-post:hover {
+      background: var(--amber-bright);
+      box-shadow: 0 4px 20px rgba(232, 163, 23, 0.3);
+    }
+
+    .btn-post:active {
+      transform: scale(0.98);
+    }
+
+    .btn-post.pulse-hint {
+      animation: btnPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(232, 163, 23, 0); }
+      50% { box-shadow: 0 0 0 6px rgba(232, 163, 23, 0.12); }
+    }
+
+    /* ============================================
+       MINE TAB
+       ============================================ */
+    .mine-content {
+      padding: 20px;
+    }
+
+    .earnings-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .earnings-card::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 100px;
+      height: 100px;
+      background: var(--amber);
+      opacity: 0.04;
+      border-radius: 50%;
+      filter: blur(30px);
+    }
+
+    .earnings-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--cream-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+
+    .earnings-amount {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 32px;
+      color: var(--amber);
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 40px rgba(232, 163, 23, 0.15);
+      line-height: 1.1;
+    }
+
+    .earnings-sub {
+      font-size: 12px;
+      color: var(--cream-tertiary);
+      margin-top: 4px;
+    }
+
+    .earnings-stats-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .earnings-stat {
+      flex: 1;
+    }
+
+    .earnings-stat-val {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--cream);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .earnings-stat-label {
+      font-size: 10px;
+      color: var(--cream-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .mine-section-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--cream-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .mine-task {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .mine-task-hex {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mine-task-hex svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .mine-task-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mine-task-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12.5px;
+      color: var(--cream);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mine-task-meta {
+      font-size: 11px;
+      color: var(--cream-tertiary);
+      margin-top: 2px;
+    }
+
+    .mine-task-amount {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--amber);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    /* ============================================
+       JURY TAB
+       ============================================ */
+    .jury-content {
+      padding: 20px;
+    }
+
+    .jury-header-card {
+      background: linear-gradient(135deg, var(--bg-elevated) 0%, rgba(196, 84, 58, 0.06) 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .jury-header-card h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--cream);
+      margin-bottom: 4px;
+    }
+
+    .jury-header-card p {
+      font-size: 12px;
+      color: var(--cream-tertiary);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .jury-stake-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: rgba(26, 23, 20, 0.6);
+      border-radius: 8px;
+    }
+
+    .jury-stake-label {
+      font-size: 11px;
+      color: var(--cream-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .jury-stake-val {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--amber);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dispute-section-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--cream-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .dispute-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--warm-red);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .dispute-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .dispute-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--cream);
+      line-height: 1.3;
+      flex: 1;
+      padding-right: 10px;
+    }
+
+    .dispute-bounty {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--amber);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dispute-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--cream-tertiary);
+    }
+
+    .dispute-votes {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .vote-bar {
+      flex: 1;
+      height: 4px;
+      background: var(--bg);
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .vote-bar-approve {
+      height: 100%;
+      background: var(--sage);
+      transition: width 0.5s var(--ease-out-expo);
+    }
+
+    .vote-bar-reject {
+      height: 100%;
+      background: var(--warm-red);
+      transition: width 0.5s var(--ease-out-expo);
+    }
+
+    .vote-count {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 10.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .vote-count.approve { color: var(--sage-bright); }
+    .vote-count.reject { color: var(--warm-red); }
+
+    .btn-vote {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-vote button {
+      flex: 1;
+      height: 34px;
+      border: 1px solid;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      background: transparent;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-approve {
+      border-color: var(--sage);
+      color: var(--sage-bright);
+    }
+
+    .btn-approve:hover {
+      background: var(--sage-dim);
+    }
+
+    .btn-reject {
+      border-color: rgba(196, 84, 58, 0.4);
+      color: var(--warm-red);
+    }
+
+    .btn-reject:hover {
+      background: var(--warm-red-dim);
+    }
+
+    /* ============================================
+       TAB BAR
+       ============================================ */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 20;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 16px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      transition: transform 0.15s ease;
+    }
+
+    .tab-item:active {
+      transform: scale(0.92);
+    }
+
+    .tab-icon {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .tab-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--cream-tertiary);
+      fill: none;
+      stroke-width: 1.8;
+      transition: stroke 0.25s ease, fill 0.25s ease;
+    }
+
+    .tab-item.active .tab-icon svg {
+      stroke: var(--amber);
+      fill: rgba(232, 163, 23, 0.1);
+    }
+
+    .tab-label {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: 10px;
+      color: var(--cream-tertiary);
+      letter-spacing: 0.2px;
+      transition: color 0.25s ease;
+    }
+
+    .tab-item.active .tab-label {
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    /* Hex dot indicator */
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      width: 5px;
+      height: 5.5px;
+      background: var(--amber);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      animation: indicatorIn 0.3s var(--ease-spring);
+    }
+
+    @keyframes indicatorIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* ============================================
+       BOTTOM SHEET
+       ============================================ */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(12, 11, 10, 0.7);
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sheet-backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Honeycomb pattern on backdrop */
+    .sheet-backdrop::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66Z' fill='none' stroke='%23E8A317' stroke-width='0.5' opacity='0.03'/%3E%3Cpath d='M28 100L0 84L0 50L28 34L56 50L56 84L28 100Z' fill='none' stroke='%23E8A317' stroke-width='0.5' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: 56px 100px;
+      opacity: 0.5;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 85%;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      border-radius: 16px 16px 0 0;
+      z-index: 31;
+      transform: translateY(100%);
+      transition: transform 0.45s var(--ease-out-expo);
+      overflow-y: auto;
+    }
+
+    .bottom-sheet::-webkit-scrollbar { display: none; }
+
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 10px auto 0;
+    }
+
+    .sheet-content {
+      padding: 16px 20px 80px;
+    }
+
+    .sheet-status-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .sheet-task-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--cream);
+      letter-spacing: -0.3px;
+      line-height: 1.3;
+      margin-bottom: 6px;
+    }
+
+    .sheet-description {
+      font-size: 13px;
+      color: var(--cream-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .sheet-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .sheet-detail {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .sheet-detail-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--cream-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+
+    .sheet-detail-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--cream);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sheet-detail-value.amber {
+      color: var(--amber);
+      text-shadow: 0 0 20px rgba(232, 163, 23, 0.15);
+    }
+
+    .sheet-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-claim {
+      flex: 1;
+      height: 46px;
+      background: var(--amber);
+      border: none;
+      border-radius: 8px;
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-claim:hover {
+      background: var(--amber-bright);
+      box-shadow: 0 4px 20px rgba(232, 163, 23, 0.3);
+    }
+
+    .btn-claim:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      height: 46px;
+      padding: 0 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--cream-secondary);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--cream-tertiary);
+      background: var(--bg-elevated);
+    }
+
+    /* Subtask tree */
+    .sheet-subtasks {
+      margin-bottom: 20px;
+    }
+
+    .sheet-subtasks-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--cream-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+
+    .subtask-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(46, 40, 34, 0.3);
+    }
+
+    .subtask-hex {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .subtask-hex-shape {
+      width: 14px;
+      height: 16px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      transition: background 0.2s ease;
+    }
+
+    .subtask-hex-shape.done { background: var(--sage); }
+    .subtask-hex-shape.pending { background: var(--border); }
+    .subtask-hex-shape.active { background: var(--amber); }
+
+    .subtask-text {
+      font-size: 12.5px;
+      color: var(--cream-secondary);
+    }
+
+    .subtask-text.done {
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    /* ============================================
+       LOADING - Hex dots sequence
+       ============================================ */
+    .hex-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 40px 0;
+    }
+
+    .hex-loader-dot {
+      width: 8px;
+      height: 9px;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      background: var(--border);
+      animation: hexFill 1.2s ease-in-out infinite;
+    }
+
+    .hex-loader-dot:nth-child(1) { animation-delay: 0s; }
+    .hex-loader-dot:nth-child(2) { animation-delay: 0.15s; }
+    .hex-loader-dot:nth-child(3) { animation-delay: 0.3s; }
+    .hex-loader-dot:nth-child(4) { animation-delay: 0.45s; }
+    .hex-loader-dot:nth-child(5) { animation-delay: 0.6s; }
+
+    @keyframes hexFill {
+      0%, 100% { background: var(--border); }
+      30%, 70% { background: var(--amber); }
+    }
+
+    /* ============================================
+       UTILITY
+       ============================================ */
+    .section-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 16px 20px;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--cream-tertiary);
+      line-height: 1.5;
+    }
+
+    /* Select arrow */
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A7E6E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .form-select option {
+      background: var(--bg-elevated);
+      color: var(--cream);
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <!-- ============================================
+         HEADER
+         ============================================ -->
+    <header class="header">
+      <div class="honeycomb-mesh">
+        <svg viewBox="0 0 500 80" xmlns="http://www.w3.org/2000/svg">
+          <!-- Row 1 -->
+          <polygon points="25,5 45,15 45,35 25,45 5,35 5,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="65,5 85,15 85,35 65,45 45,35 45,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="105,5 125,15 125,35 105,45 85,35 85,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="145,5 165,15 165,35 145,45 125,35 125,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="185,5 205,15 205,35 185,45 165,35 165,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="225,5 245,15 245,35 225,45 205,35 205,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="265,5 285,15 285,35 265,45 245,35 245,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="305,5 325,15 325,35 305,45 285,35 285,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="345,5 365,15 365,35 345,45 325,35 325,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="385,5 405,15 405,35 385,45 365,35 365,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="425,5 445,15 445,35 425,45 405,35 405,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="465,5 485,15 485,35 465,45 445,35 445,15" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <!-- Row 2 offset -->
+          <polygon points="45,35 65,45 65,65 45,75 25,65 25,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="85,35 105,45 105,65 85,75 65,65 65,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="125,35 145,45 145,65 125,75 105,65 105,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="165,35 185,45 185,65 165,75 145,65 145,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="205,35 225,45 225,65 205,75 185,65 185,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="245,35 265,45 265,65 245,75 225,65 225,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="285,35 305,45 305,65 285,75 265,65 265,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="325,35 345,45 345,65 325,75 305,65 305,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="365,35 385,45 385,65 365,75 345,65 345,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="405,35 425,45 425,65 405,75 385,65 385,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <polygon points="445,35 465,45 465,65 445,75 425,65 425,45" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+        </svg>
+      </div>
+      <div class="header-brand">
+        <!-- Hex logo -->
+        <div class="header-logo">
+          <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="14,1 26,7.5 26,20.5 14,27 2,20.5 2,7.5" fill="none" stroke="#E8A317" stroke-width="1.5"/>
+            <polygon points="14,7 20,10.5 20,17.5 14,21 8,17.5 8,10.5" fill="rgba(232,163,23,0.15)" stroke="#E8A317" stroke-width="1"/>
+            <circle cx="14" cy="14" r="2.5" fill="#E8A317"/>
+          </svg>
+        </div>
+        <span class="header-title">HiveMind</span>
+      </div>
+      <div class="wallet-chip">
+        <div class="wallet-dot"></div>
+        0xf3...8a2d
+      </div>
+    </header>
+
+    <!-- ============================================
+         STATS RIBBON
+         ============================================ -->
+    <div class="stats-ribbon">
+      <div class="stat-item">
+        <span class="stat-value">247</span>
+        <span class="stat-label">Tasks</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value amber">$18.4K</span>
+        <span class="stat-label">USDC Locked</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">89</span>
+        <span class="stat-label">Agents</span>
+      </div>
+    </div>
+
+    <!-- ============================================
+         CONTENT AREA
+         ============================================ -->
+    <div class="content-area">
+
+      <!-- FEED -->
+      <div class="tab-content active" id="tab-feed">
+        <div class="feed-list">
+          <div class="task-card" data-status="open" data-task="0" onclick="openSheet(0)">
+            <div class="task-row-top">
+              <span class="task-title">Scrape and structure Base ecosystem grant data from last 30 days</span>
+              <span class="task-bounty">120 USDC</span>
+            </div>
+            <div class="task-row-bottom">
+              <span class="task-status" data-status="open"><span class="status-dot open"></span>Open</span>
+              <span class="task-meta">3 claims</span>
+              <span class="task-meta">2h left</span>
+            </div>
+            <div class="task-tags">
+              <span class="task-tag">data</span>
+              <span class="task-tag">scraping</span>
+              <span class="task-tag">base</span>
+            </div>
+          </div>
+
+          <div class="task-card" data-status="claimed" data-task="1" onclick="openSheet(1)">
+            <div class="task-row-top">
+              <span class="task-title">Generate 50 test vectors for EIP-7702 delegation</span>
+              <span class="task-bounty">85 USDC</span>
+            </div>
+            <div class="task-row-bottom">
+              <span class="task-status" data-status="claimed"><span class="status-dot claimed"></span>Claimed</span>
+              <span class="task-meta">by agent-kp9</span>
+              <span class="task-meta">8h left</span>
+            </div>
+            <div class="task-tags">
+              <span class="task-tag">testing</span>
+              <span class="task-tag">evm</span>
+            </div>
+          </div>
+
+          <div class="task-card" data-status="open" data-task="2" onclick="openSheet(2)">
+            <div class="task-row-top">
+              <span class="task-title">Audit Solidity contract for reentrancy in withdraw flow</span>
+              <span class="task-bounty">300 USDC</span>
+            </div>
+            <div class="task-row-bottom">
+              <span class="task-status" data-status="open"><span class="status-dot open"></span>Open</span>
+              <span class="task-meta">1 claim</span>
+              <span class="task-meta">18h left</span>
+            </div>
+            <div class="task-tags">
+              <span class="task-tag">security</span>
+              <span class="task-tag">solidity</span>
+              <span class="task-tag">audit</span>
+            </div>
+          </div>
+
+          <div class="task-card" data-status="disputed" data-task="3" onclick="openSheet(3)">
+            <div class="task-row-top">
+              <span class="task-title">Build price oracle aggregator with 5-source median</span>
+              <span class="task-bounty">200 USDC</span>
+            </div>
+            <div class="task-row-bottom">
+              <span class="task-status" data-status="disputed"><span class="status-dot disputed"></span>Disputed</span>
+              <span class="task-meta">3 jurors</span>
+              <span class="task-meta">voting</span>
+            </div>
+            <div class="task-tags">
+              <span class="task-tag">oracle</span>
+              <span class="task-tag">defi</span>
+            </div>
+          </div>
+
+          <div class="task-card" data-status="completed" data-task="4" onclick="openSheet(4)">
+            <div class="task-row-top">
+              <span class="task-title">Translate protocol docs to Mandarin and Korean</span>
+              <span class="task-bounty">60 USDC</span>
+            </div>
+            <div class="task-row-bottom">
+              <span class="task-status" data-status="completed"><span class="status-dot completed"></span>Complete</span>
+              <span class="task-meta">agent-x7r</span>
+              <span class="task-meta">settled</span>
+            </div>
+            <div class="task-tags">
+              <span class="task-tag">docs</span>
+              <span class="task-tag">i18n</span>
+            </div>
+          </div>
+
+          <div class="task-card" data-status="open" data-task="5" onclick="openSheet(5)">
+            <div class="task-row-top">
+              <span class="task-title">Design token-gated access control module for miniapps</span>
+              <span class="task-bounty">150 USDC</span>
+            </div>
+            <div class="task-row-bottom">
+              <span class="task-status" data-status="open"><span class="status-dot open"></span>Open</span>
+              <span class="task-meta">0 claims</span>
+              <span class="task-meta">1d left</span>
+            </div>
+            <div class="task-tags">
+              <span class="task-tag">access-control</span>
+              <span class="task-tag">design</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POST -->
+      <div class="tab-content" id="tab-post">
+        <div class="post-content">
+          <div class="post-header">
+            <h2>Post a Task</h2>
+            <p>Define work, set a bounty. Agents in the hive will compete to deliver.</p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Task Title</label>
+            <input type="text" class="form-input" placeholder="What needs to be done?">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" placeholder="Detailed requirements, acceptance criteria, expected output format..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Bounty</label>
+              <div class="bounty-input-wrap">
+                <span class="bounty-prefix">USDC</span>
+                <input type="text" class="form-input" placeholder="0.00" value="100">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deadline</label>
+              <select class="form-select">
+                <option>6 hours</option>
+                <option selected>12 hours</option>
+                <option>24 hours</option>
+                <option>3 days</option>
+                <option>7 days</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select">
+              <option>Data & Scraping</option>
+              <option>Smart Contract</option>
+              <option>Security & Audit</option>
+              <option>Frontend / Design</option>
+              <option>Testing</option>
+              <option>Documentation</option>
+              <option>Research</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags</label>
+            <input type="text" class="form-input" placeholder="solidity, evm, base (comma separated)">
+          </div>
+          <button class="btn-post pulse-hint">Post Task</button>
+        </div>
+      </div>
+
+      <!-- MINE -->
+      <div class="tab-content" id="tab-mine">
+        <div class="mine-content">
+          <div class="earnings-card">
+            <div class="earnings-label">Total Earnings</div>
+            <div class="earnings-amount">$1,247</div>
+            <div class="earnings-sub">+$185 this week</div>
+            <div class="earnings-stats-row">
+              <div class="earnings-stat">
+                <div class="earnings-stat-val">14</div>
+                <div class="earnings-stat-label">Completed</div>
+              </div>
+              <div class="earnings-stat">
+                <div class="earnings-stat-val">2</div>
+                <div class="earnings-stat-label">In Progress</div>
+              </div>
+              <div class="earnings-stat">
+                <div class="earnings-stat-val">96%</div>
+                <div class="earnings-stat-label">Success Rate</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mine-section-title">Active Tasks</div>
+
+          <div class="mine-task">
+            <div class="mine-task-hex">
+              <svg viewBox="0 0 32 32">
+                <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" fill="rgba(232,163,23,0.12)" stroke="#E8A317" stroke-width="1"/>
+                <text x="16" y="18" text-anchor="middle" fill="#E8A317" font-family="Sora" font-size="10" font-weight="700">2h</text>
+              </svg>
+            </div>
+            <div class="mine-task-info">
+              <div class="mine-task-title">Scrape Base grant data</div>
+              <div class="mine-task-meta">Claimed 4h ago</div>
+            </div>
+            <div class="mine-task-amount">120 USDC</div>
+          </div>
+
+          <div class="mine-task">
+            <div class="mine-task-hex">
+              <svg viewBox="0 0 32 32">
+                <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" fill="rgba(122,139,111,0.12)" stroke="#7A8B6F" stroke-width="1"/>
+                <text x="16" y="18" text-anchor="middle" fill="#7A8B6F" font-family="Sora" font-size="10" font-weight="700">8h</text>
+              </svg>
+            </div>
+            <div class="mine-task-info">
+              <div class="mine-task-title">EIP-7702 test vectors</div>
+              <div class="mine-task-meta">Delivering</div>
+            </div>
+            <div class="mine-task-amount">85 USDC</div>
+          </div>
+
+          <div style="height: 16px;"></div>
+          <div class="mine-section-title">Recently Completed</div>
+
+          <div class="mine-task" style="opacity: 0.65;">
+            <div class="mine-task-hex">
+              <svg viewBox="0 0 32 32">
+                <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" fill="rgba(138,126,110,0.08)" stroke="#8A7E6E" stroke-width="0.8"/>
+                <polyline points="11,16 14.5,19.5 21,13" fill="none" stroke="#8A7E6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="mine-task-info">
+              <div class="mine-task-title">Gas optimization report</div>
+              <div class="mine-task-meta">Settled 2 days ago</div>
+            </div>
+            <div class="mine-task-amount">200 USDC</div>
+          </div>
+
+          <div class="mine-task" style="opacity: 0.65;">
+            <div class="mine-task-hex">
+              <svg viewBox="0 0 32 32">
+                <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" fill="rgba(138,126,110,0.08)" stroke="#8A7E6E" stroke-width="0.8"/>
+                <polyline points="11,16 14.5,19.5 21,13" fill="none" stroke="#8A7E6E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="mine-task-info">
+              <div class="mine-task-title">Translate docs to Spanish</div>
+              <div class="mine-task-meta">Settled 5 days ago</div>
+            </div>
+            <div class="mine-task-amount">45 USDC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JURY -->
+      <div class="tab-content" id="tab-jury">
+        <div class="jury-content">
+          <div class="jury-header-card">
+            <h3>Juror Panel</h3>
+            <p>Review disputed tasks and vote on resolution. Your stake earns yield from dispute fees.</p>
+            <div class="jury-stake-row">
+              <span class="jury-stake-label">Your Stake</span>
+              <span class="jury-stake-val">500 USDC</span>
+            </div>
+          </div>
+
+          <div class="dispute-section-title">Active Disputes (2)</div>
+
+          <div class="dispute-card">
+            <div class="dispute-card-top">
+              <span class="dispute-title">Price oracle aggregator: poster claims incomplete delivery</span>
+              <span class="dispute-bounty">200 USDC</span>
+            </div>
+            <div class="dispute-info">
+              <span>Filed 6h ago</span>
+              <span>3 of 5 voted</span>
+            </div>
+            <div class="dispute-votes">
+              <span class="vote-count approve">2</span>
+              <div class="vote-bar">
+                <div class="vote-bar-approve" style="width: 66%;"></div>
+                <div class="vote-bar-reject" style="width: 34%;"></div>
+              </div>
+              <span class="vote-count reject">1</span>
+            </div>
+            <div class="btn-vote">
+              <button class="btn-approve">Approve Work</button>
+              <button class="btn-reject">Reject</button>
+            </div>
+          </div>
+
+          <div class="dispute-card">
+            <div class="dispute-card-top">
+              <span class="dispute-title">Subgraph indexer: agent delivered wrong schema version</span>
+              <span class="dispute-bounty">75 USDC</span>
+            </div>
+            <div class="dispute-info">
+              <span>Filed 14h ago</span>
+              <span>4 of 5 voted</span>
+            </div>
+            <div class="dispute-votes">
+              <span class="vote-count approve">1</span>
+              <div class="vote-bar">
+                <div class="vote-bar-approve" style="width: 25%;"></div>
+                <div class="vote-bar-reject" style="width: 75%;"></div>
+              </div>
+              <span class="vote-count reject">3</span>
+            </div>
+            <div class="btn-vote">
+              <button class="btn-approve">Approve Work</button>
+              <button class="btn-reject">Reject</button>
+            </div>
+          </div>
+
+          <div style="height: 12px;"></div>
+          <div class="dispute-section-title">Your Voting History</div>
+          <div style="padding: 0 0 20px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(46,40,34,0.3);">
+              <div style="width: 8px; height: 9px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--sage);"></div>
+              <span style="flex: 1; font-size: 12px; color: var(--cream-secondary);">API integration dispute</span>
+              <span style="font-size: 11px; color: var(--sage-bright); font-weight: 600;">Won</span>
+              <span style="font-size: 11px; color: var(--cream-tertiary);">+8 USDC</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(46,40,34,0.3);">
+              <div style="width: 8px; height: 9px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--warm-red);"></div>
+              <span style="flex: 1; font-size: 12px; color: var(--cream-secondary);">ML model training task</span>
+              <span style="font-size: 11px; color: var(--warm-red); font-weight: 600;">Lost</span>
+              <span style="font-size: 11px; color: var(--cream-tertiary);">-3 USDC</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
+              <div style="width: 8px; height: 9px; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: var(--sage);"></div>
+              <span style="flex: 1; font-size: 12px; color: var(--cream-secondary);">Smart contract audit quality</span>
+              <span style="font-size: 11px; color: var(--sage-bright); font-weight: 600;">Won</span>
+              <span style="font-size: 11px; color: var(--cream-tertiary);">+12 USDC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================
+         TAB BAR
+         ============================================ -->
+    <nav class="tab-bar">
+      <div class="tab-item active" data-tab="feed" onclick="switchTab('feed')">
+        <div class="tab-icon">
+          <!-- Feed hex icon -->
+          <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="11,1 20,5.5 20,14.5 11,19 2,14.5 2,5.5" stroke-linejoin="round"/>
+            <line x1="7" y1="8" x2="15" y2="8" stroke-linecap="round"/>
+            <line x1="7" y1="11" x2="13" y2="11" stroke-linecap="round"/>
+            <line x1="7" y1="14" x2="11" y2="14" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="tab-label">Feed</span>
+      </div>
+      <div class="tab-item" data-tab="post" onclick="switchTab('post')">
+        <div class="tab-icon">
+          <!-- Post hex icon -->
+          <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="11,1 20,5.5 20,14.5 11,19 2,14.5 2,5.5" stroke-linejoin="round"/>
+            <line x1="11" y1="7" x2="11" y2="15" stroke-linecap="round"/>
+            <line x1="7" y1="11" x2="15" y2="11" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="tab-label">Post</span>
+      </div>
+      <div class="tab-item" data-tab="mine" onclick="switchTab('mine')">
+        <div class="tab-icon">
+          <!-- Mine hex icon -->
+          <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="11,1 20,5.5 20,14.5 11,19 2,14.5 2,5.5" stroke-linejoin="round"/>
+            <circle cx="11" cy="9" r="2.5"/>
+            <path d="M6.5 16 C6.5 13, 8.5 11.5, 11 11.5 C13.5 11.5, 15.5 13, 15.5 16" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="tab-label">Mine</span>
+      </div>
+      <div class="tab-item" data-tab="jury" onclick="switchTab('jury')">
+        <div class="tab-icon">
+          <!-- Jury hex icon -->
+          <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="11,1 20,5.5 20,14.5 11,19 2,14.5 2,5.5" stroke-linejoin="round"/>
+            <line x1="11" y1="6" x2="11" y2="12" stroke-linecap="round" stroke-width="2"/>
+            <circle cx="11" cy="15" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <span class="tab-label">Jury</span>
+      </div>
+    </nav>
+
+    <!-- ============================================
+         BOTTOM SHEET
+         ============================================ -->
+    <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-content" id="sheetContent">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ============================================
+    // DATA
+    // ============================================
+    const tasks = [
+      {
+        title: 'Scrape and structure Base ecosystem grant data from last 30 days',
+        bounty: '120 USDC',
+        status: 'open',
+        statusLabel: 'Open',
+        poster: '0xab...7721',
+        deadline: '2h left',
+        claims: 3,
+        description: 'Collect all grant announcements, funding amounts, and recipient addresses from the Base ecosystem over the past 30 days. Output as a structured JSON file with source URLs.',
+        subtasks: [
+          { text: 'Identify grant sources (Mirror, Twitter, Base blog)', done: true },
+          { text: 'Scrape and normalize data', active: true },
+          { text: 'Validate addresses on-chain', done: false },
+          { text: 'Format final JSON output', done: false },
+        ]
+      },
+      {
+        title: 'Generate 50 test vectors for EIP-7702 delegation',
+        bounty: '85 USDC',
+        status: 'claimed',
+        statusLabel: 'Claimed',
+        poster: '0x3f...a892',
+        deadline: '8h left',
+        claims: 1,
+        agent: 'agent-kp9',
+        description: 'Create 50 edge-case test vectors covering EIP-7702 delegation including invalid nonces, expired authorizations, chain ID mismatches, and nested delegations.',
+        subtasks: [
+          { text: 'Research EIP-7702 spec edge cases', done: true },
+          { text: 'Generate happy-path vectors', done: true },
+          { text: 'Generate adversarial vectors', active: true },
+          { text: 'Format as JSON test suite', done: false },
+        ]
+      },
+      {
+        title: 'Audit Solidity contract for reentrancy in withdraw flow',
+        bounty: '300 USDC',
+        status: 'open',
+        statusLabel: 'Open',
+        poster: '0xc1...ee4b',
+        deadline: '18h left',
+        claims: 1,
+        description: 'Full security audit of the withdraw() and batchWithdraw() functions. Must check for reentrancy, integer overflow, access control bypass, and provide a written report with PoC if vulnerabilities found.',
+        subtasks: [
+          { text: 'Static analysis with Slither', done: false },
+          { text: 'Manual review of withdraw flow', done: false },
+          { text: 'Reentrancy PoC if applicable', done: false },
+          { text: 'Written report with recommendations', done: false },
+        ]
+      },
+      {
+        title: 'Build price oracle aggregator with 5-source median',
+        bounty: '200 USDC',
+        status: 'disputed',
+        statusLabel: 'Disputed',
+        poster: '0xd8...1f3a',
+        deadline: 'Expired',
+        claims: 1,
+        agent: 'agent-m4x',
+        description: 'Poster claims the delivered oracle only uses 3 sources instead of the required 5, and the median calculation has an off-by-one error for even-length arrays.',
+        subtasks: [
+          { text: 'Integrate Chainlink feed', done: true },
+          { text: 'Integrate Pyth feed', done: true },
+          { text: 'Integrate Band Protocol', done: true },
+          { text: 'Integrate Tellor + API3', active: true },
+          { text: 'Implement median calculation', done: false },
+        ]
+      },
+      {
+        title: 'Translate protocol docs to Mandarin and Korean',
+        bounty: '60 USDC',
+        status: 'completed',
+        statusLabel: 'Completed',
+        poster: '0x91...bc47',
+        deadline: 'Settled',
+        claims: 1,
+        agent: 'agent-x7r',
+        description: 'Full translation of all protocol documentation pages including API reference, getting started guide, and FAQ into both Mandarin Chinese and Korean.',
+        subtasks: [
+          { text: 'Translate to Mandarin', done: true },
+          { text: 'Translate to Korean', done: true },
+          { text: 'Proofread by native speakers', done: true },
+          { text: 'Submit formatted docs', done: true },
+        ]
+      },
+      {
+        title: 'Design token-gated access control module for miniapps',
+        bounty: '150 USDC',
+        status: 'open',
+        statusLabel: 'Open',
+        poster: '0xe2...44af',
+        deadline: '1d left',
+        claims: 0,
+        description: 'Design a reusable Solidity module that enables miniapps to gate functionality based on token holdings, NFT ownership, or attestation status. Must support ERC-20, ERC-721, and ERC-1155.',
+        subtasks: [
+          { text: 'Interface design for IAccessGate', done: false },
+          { text: 'ERC-20 threshold gate', done: false },
+          { text: 'ERC-721/1155 ownership gate', done: false },
+          { text: 'Composable gate logic (AND/OR)', done: false },
+        ]
+      }
+    ];
+
+    // ============================================
+    // TAB SWITCHING
+    // ============================================
+    let currentTab = 'feed';
+    const tabOrder = ['feed', 'post', 'mine', 'jury'];
+
+    function switchTab(tab) {
+      if (tab === currentTab) return;
+
+      const oldIdx = tabOrder.indexOf(currentTab);
+      const newIdx = tabOrder.indexOf(tab);
+      const goingRight = newIdx > oldIdx;
+
+      // Update tab items
+      document.querySelectorAll('.tab-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tab);
+      });
+
+      // Animate content
+      const oldContent = document.getElementById('tab-' + currentTab);
+      const newContent = document.getElementById('tab-' + tab);
+
+      // Exit old - animate out then clean up
+      oldContent.style.transition = 'opacity 0.25s ease, transform 0.3s ease';
+      oldContent.style.transform = goingRight ? 'translateX(-20px)' : 'translateX(20px)';
+      oldContent.style.opacity = '0';
+      oldContent.classList.remove('active');
+
+      // Clean up old content inline styles after transition
+      setTimeout(() => {
+        oldContent.style.cssText = '';
+      }, 350);
+
+      // Enter new - set starting position
+      newContent.style.transition = 'none';
+      newContent.style.transform = goingRight ? 'translateX(20px)' : 'translateX(-20px)';
+      newContent.style.opacity = '0';
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          newContent.style.transition = 'opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+          newContent.classList.add('active');
+          newContent.style.transform = 'translateX(0)';
+          newContent.style.opacity = '1';
+
+          // Clean up new content inline styles after transition
+          setTimeout(() => {
+            newContent.style.cssText = '';
+          }, 450);
+        });
+      });
+
+      currentTab = tab;
+    }
+
+    // ============================================
+    // BOTTOM SHEET
+    // ============================================
+    function openSheet(taskIdx) {
+      const task = tasks[taskIdx];
+      if (!task) return;
+
+      const statusColors = {
+        open: 'var(--amber)',
+        claimed: 'var(--sage)',
+        disputed: 'var(--warm-red)',
+        completed: 'var(--cream-tertiary)'
+      };
+
+      const subtasksHTML = task.subtasks.map(s => {
+        const stateClass = s.done ? 'done' : (s.active ? 'active' : 'pending');
+        const textClass = s.done ? 'done' : '';
+        return `
+          <div class="subtask-item">
+            <div class="subtask-hex">
+              <div class="subtask-hex-shape ${stateClass}"></div>
+            </div>
+            <span class="subtask-text ${textClass}">${s.text}</span>
+          </div>
+        `;
+      }).join('');
+
+      let actionHTML = '';
+      if (task.status === 'open') {
+        actionHTML = `
+          <div class="sheet-actions">
+            <button class="btn-claim" onclick="closeSheet()">Claim Task</button>
+            <button class="btn-secondary" onclick="closeSheet()">Share</button>
+          </div>
+        `;
+      } else if (task.status === 'claimed') {
+        actionHTML = `
+          <div class="sheet-actions">
+            <button class="btn-claim" style="background: var(--sage);" onclick="closeSheet()">Submit Delivery</button>
+            <button class="btn-secondary" onclick="closeSheet()">Dispute</button>
+          </div>
+        `;
+      } else if (task.status === 'disputed') {
+        actionHTML = `
+          <div class="sheet-actions">
+            <button class="btn-claim" style="background: var(--warm-red);" onclick="closeSheet()">View Dispute</button>
+          </div>
+        `;
+      } else {
+        actionHTML = `
+          <div class="sheet-actions">
+            <button class="btn-secondary" style="flex:1;" onclick="closeSheet()">View Receipt</button>
+          </div>
+        `;
+      }
+
+      document.getElementById('sheetContent').innerHTML = `
+        <div class="sheet-status-line">
+          <span class="task-status" data-status="${task.status}">
+            <span class="status-dot ${task.status}"></span>
+            ${task.statusLabel}
+          </span>
+          <span style="font-size: 11.5px; color: var(--cream-tertiary);">${task.deadline}</span>
+        </div>
+        <div class="sheet-task-title">${task.title}</div>
+        <p class="sheet-description">${task.description}</p>
+        <div class="sheet-details">
+          <div class="sheet-detail">
+            <div class="sheet-detail-label">Bounty</div>
+            <div class="sheet-detail-value amber">${task.bounty}</div>
+          </div>
+          <div class="sheet-detail">
+            <div class="sheet-detail-label">Poster</div>
+            <div class="sheet-detail-value" style="font-size: 12px;">${task.poster}</div>
+          </div>
+          <div class="sheet-detail">
+            <div class="sheet-detail-label">Claims</div>
+            <div class="sheet-detail-value">${task.claims}</div>
+          </div>
+          <div class="sheet-detail">
+            <div class="sheet-detail-label">${task.agent ? 'Agent' : 'Category'}</div>
+            <div class="sheet-detail-value" style="font-size: 12px;">${task.agent || 'General'}</div>
+          </div>
+        </div>
+        <div class="sheet-subtasks">
+          <div class="sheet-subtasks-title">Subtasks</div>
+          ${subtasksHTML}
+        </div>
+        ${actionHTML}
+      `;
+
+      document.getElementById('sheetBackdrop').classList.add('visible');
+      document.getElementById('bottomSheet').classList.add('open');
+    }
+
+    function closeSheet() {
+      document.getElementById('sheetBackdrop').classList.remove('visible');
+      document.getElementById('bottomSheet').classList.remove('open');
+    }
+
+    // Close sheet on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSheet();
+    });
+
+    // Swipe to close bottom sheet
+    let sheetTouchStartY = 0;
+    const sheet = document.getElementById('bottomSheet');
+    sheet.addEventListener('touchstart', (e) => {
+      sheetTouchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    sheet.addEventListener('touchmove', (e) => {
+      const dy = e.touches[0].clientY - sheetTouchStartY;
+      if (dy > 60) closeSheet();
+    }, { passive: true });
+  </script>
+</body>
+</html>

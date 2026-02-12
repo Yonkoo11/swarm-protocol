@@ -1,0 +1,2118 @@
+<!DOCTYPE html>
+<!--
+  HiveMind - Proposal 4B: "LIVING HIVE" (Elevated)
+  DNA: DNA-GEO-WARM-BOLD-ORGANIC-ALIVE
+
+  Every pixel is considered. Every transition is physical.
+  This is not a themed UI. This is a crafted artifact.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMind - Living Hive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       RESET + FOUNDATIONS
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Background system */
+      --bg-deep: #0e0d0b;
+      --bg: #141210;
+      --bg-surface: #1e1b17;
+      --bg-surface-gradient: linear-gradient(135deg, #1e1b17, #1a1714);
+      --bg-surface-hover: #252118;
+
+      /* Amber spectrum */
+      --amber-deep: #8B6914;
+      --amber-core: #E8A317;
+      --amber-bright: #F5C842;
+      --amber-glow: rgba(232, 163, 23, 0.15);
+      --amber-glow-strong: rgba(232, 163, 23, 0.3);
+      --amber-glow-subtle: rgba(232, 163, 23, 0.08);
+
+      /* Text hierarchy */
+      --text-primary: #F0E6D6;
+      --text-secondary: #9B8E7B;
+      --text-tertiary: #5C5347;
+
+      /* Semantic */
+      --sage: #7A8B6F;
+      --sage-dim: rgba(122, 139, 111, 0.12);
+      --warm-red: #C4543A;
+      --warm-red-dim: rgba(196, 84, 58, 0.12);
+
+      /* Borders */
+      --border: rgba(232, 163, 23, 0.08);
+      --border-hover: rgba(232, 163, 23, 0.15);
+
+      /* Fonts */
+      --font-display: 'Sora', sans-serif;
+      --font-body: 'Inter', -apple-system, sans-serif;
+
+      /* Curves */
+      --spring: cubic-bezier(0.32, 0.72, 0, 1);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: #080807;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* Selection color */
+    ::selection {
+      background: rgba(232, 163, 23, 0.3);
+      color: var(--text-primary);
+    }
+
+    /* ============================================
+       SCROLLBAR
+       ============================================ */
+    ::-webkit-scrollbar {
+      width: 3px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(232, 163, 23, 0.15);
+      border-radius: 3px;
+    }
+
+    /* ============================================
+       APP SHELL
+       ============================================ */
+    .app {
+      width: 424px;
+      height: 695px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow:
+        0 0 0 1px rgba(232, 163, 23, 0.06),
+        0 24px 80px rgba(0, 0, 0, 0.6),
+        0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Noise texture overlay */
+    .app::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 100;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    /* ============================================
+       HEADER
+       ============================================ */
+    .header {
+      position: relative;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(30, 27, 23, 0.6) 0%, transparent 100%);
+      z-index: -1;
+    }
+
+    /* Honeycomb mesh */
+    .honeycomb-mesh {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: -1;
+      opacity: 0.03;
+    }
+
+    .honeycomb-mesh svg {
+      position: absolute;
+      top: -30px;
+      left: -30px;
+      width: calc(100% + 60px);
+      height: calc(100% + 60px);
+      animation: meshDrift 25s ease-in-out infinite;
+    }
+
+    @keyframes meshDrift {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(4px, -3px) rotate(0.3deg); }
+      50% { transform: translate(-3px, 4px) rotate(-0.2deg); }
+      75% { transform: translate(3px, 2px) rotate(0.1deg); }
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Hex logo - larger, layered */
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .header-logo svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 8px rgba(232, 163, 23, 0.2));
+    }
+
+    .header-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.02em;
+      color: var(--text-primary);
+    }
+
+    /* Wallet chip */
+    .wallet-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px 6px 8px;
+      background: rgba(30, 27, 23, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      font-variant-numeric: tabular-nums;
+      transition: border-color 0.15s ease-out;
+      cursor: pointer;
+    }
+
+    .wallet-chip:hover {
+      border-color: var(--border-hover);
+    }
+
+    .wallet-chip:active {
+      transform: scale(0.98);
+    }
+
+    .wallet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--sage);
+      box-shadow: 0 0 6px rgba(122, 139, 111, 0.5);
+      animation: walletPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes walletPulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(122, 139, 111, 0.5); }
+      50% { opacity: 0.7; box-shadow: 0 0 10px rgba(122, 139, 111, 0.3); }
+    }
+
+    /* ============================================
+       STATS RIBBON
+       ============================================ */
+    .stats-ribbon {
+      display: flex;
+      align-items: center;
+      height: 52px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(20, 18, 16, 0.5) 0%, transparent 100%);
+    }
+
+    .stat-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      position: relative;
+    }
+
+    /* Hex dividers */
+    .stat-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 12px;
+      background: var(--text-tertiary);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      opacity: 0.3;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-value.amber {
+      color: var(--amber-core);
+      text-shadow: 0 0 20px rgba(232, 163, 23, 0.2);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1;
+    }
+
+    /* ============================================
+       CONTENT AREA
+       ============================================ */
+    .content-area {
+      position: relative;
+      height: calc(695px - 56px - 52px - 52px);
+      overflow: hidden;
+    }
+
+    .tab-content {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      opacity: 0;
+      transform: translateX(16px);
+      transition: opacity 0.25s ease-out, transform 0.3s var(--spring);
+      pointer-events: none;
+      padding: 12px 12px 16px;
+    }
+
+    .tab-content.active {
+      opacity: 1 !important;
+      transform: translateX(0) !important;
+      pointer-events: auto !important;
+    }
+
+    /* ============================================
+       TASK CARDS (the showpiece)
+       ============================================ */
+    .task-card {
+      position: relative;
+      background: var(--bg-surface-gradient);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 14px 14px 16px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .task-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Status left border + ambient glow */
+    .task-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      border-radius: 2px 0 0 2px;
+    }
+
+    .task-card::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 40px;
+      pointer-events: none;
+      border-radius: 8px 0 0 8px;
+    }
+
+    /* Status color variants */
+    .task-card[data-status="open"]::before { background: var(--amber-core); box-shadow: 0 0 8px rgba(232, 163, 23, 0.4); }
+    .task-card[data-status="open"]::after { background: linear-gradient(90deg, rgba(232, 163, 23, 0.07) 0%, transparent 100%); }
+
+    .task-card[data-status="claimed"]::before { background: var(--sage); box-shadow: 0 0 6px rgba(122, 139, 111, 0.3); }
+    .task-card[data-status="claimed"]::after { background: linear-gradient(90deg, rgba(122, 139, 111, 0.06) 0%, transparent 100%); }
+
+    .task-card[data-status="disputed"]::before { background: var(--warm-red); box-shadow: 0 0 8px rgba(196, 84, 58, 0.4); }
+    .task-card[data-status="disputed"]::after { background: linear-gradient(90deg, rgba(196, 84, 58, 0.07) 0%, transparent 100%); }
+
+    .task-card[data-status="complete"]::before { background: var(--sage); }
+    .task-card[data-status="complete"]::after { background: linear-gradient(90deg, rgba(122, 139, 111, 0.04) 0%, transparent 100%); }
+
+    .task-card[data-status="review"]::before { background: #7B8EC4; box-shadow: 0 0 6px rgba(123, 142, 196, 0.3); }
+    .task-card[data-status="review"]::after { background: linear-gradient(90deg, rgba(123, 142, 196, 0.06) 0%, transparent 100%); }
+
+    .task-card:hover {
+      border-color: var(--border-hover);
+      background: linear-gradient(135deg, var(--bg-surface-hover), #1e1a15);
+      box-shadow: 0 4px 20px rgba(232, 163, 23, 0.08), 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .task-card:active {
+      transform: scale(0.985);
+      transition: transform 0.08s ease-out;
+    }
+
+    .task-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .task-card-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 15px;
+      line-height: 1.3;
+      color: var(--text-primary);
+      flex: 1;
+      margin-right: 12px;
+    }
+
+    .task-card-amount {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--amber-core);
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 20px rgba(232, 163, 23, 0.3);
+      white-space: nowrap;
+      position: relative;
+    }
+
+    /* Subtle glow behind amount */
+    .task-card-amount::after {
+      content: '';
+      position: absolute;
+      inset: -8px -12px;
+      background: radial-gradient(ellipse, rgba(232, 163, 23, 0.08) 0%, transparent 70%);
+      z-index: -1;
+      border-radius: 50%;
+    }
+
+    .task-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* Status indicator with glow ring */
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .status-dot::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      opacity: 0.3;
+    }
+
+    .status-dot[data-status="open"] {
+      background: var(--amber-core);
+      color: var(--amber-core);
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+
+    .status-dot[data-status="claimed"] {
+      background: var(--sage);
+      color: var(--sage);
+    }
+
+    .status-dot[data-status="disputed"] {
+      background: var(--warm-red);
+      color: var(--warm-red);
+      animation: statusPulse 1.2s ease-in-out infinite;
+    }
+
+    .status-dot[data-status="complete"] {
+      background: var(--sage);
+      color: var(--sage);
+    }
+
+    .status-dot[data-status="review"] {
+      background: #7B8EC4;
+      color: #7B8EC4;
+      animation: statusPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes statusPulse {
+      0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+      50% { box-shadow: 0 0 0 3px transparent; }
+    }
+
+    .status-text {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1;
+    }
+
+    .status-text[data-status="open"] { color: var(--amber-core); }
+    .status-text[data-status="claimed"] { color: var(--sage); }
+    .status-text[data-status="disputed"] { color: var(--warm-red); }
+    .status-text[data-status="complete"] { color: var(--sage); }
+    .status-text[data-status="review"] { color: #7B8EC4; }
+
+    .task-card-poster {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      line-height: 1.3;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .task-card-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    /* Refined tags */
+    .tag {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      padding: 4px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .tag-dev {
+      color: rgba(123, 142, 196, 0.85);
+      background: rgba(123, 142, 196, 0.08);
+      border: 1px solid rgba(123, 142, 196, 0.12);
+    }
+
+    .tag-design {
+      color: rgba(196, 142, 196, 0.85);
+      background: rgba(196, 142, 196, 0.08);
+      border: 1px solid rgba(196, 142, 196, 0.12);
+    }
+
+    .tag-content {
+      color: rgba(142, 196, 172, 0.85);
+      background: rgba(142, 196, 172, 0.08);
+      border: 1px solid rgba(142, 196, 172, 0.12);
+    }
+
+    .tag-research {
+      color: rgba(196, 172, 123, 0.85);
+      background: rgba(196, 172, 123, 0.08);
+      border: 1px solid rgba(196, 172, 123, 0.12);
+    }
+
+    .tag-audit {
+      color: rgba(196, 84, 58, 0.75);
+      background: rgba(196, 84, 58, 0.08);
+      border: 1px solid rgba(196, 84, 58, 0.10);
+    }
+
+    .tag-community {
+      color: rgba(232, 163, 23, 0.75);
+      background: rgba(232, 163, 23, 0.08);
+      border: 1px solid rgba(232, 163, 23, 0.10);
+    }
+
+    /* ============================================
+       TAB BAR
+       ============================================ */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      background: var(--bg-deep);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 20;
+    }
+
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s ease-out;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(232, 163, 23, 0.05);
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+    }
+
+    .tab-btn:active::before {
+      opacity: 1;
+    }
+
+    /* Active hex dot indicator */
+    .tab-btn::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      width: 4px;
+      height: 5px;
+      background: var(--amber-core);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.2s var(--spring);
+    }
+
+    .tab-btn.active::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .tab-btn svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text-tertiary);
+      transition: color 0.15s ease-out;
+    }
+
+    .tab-btn.active svg {
+      color: var(--amber-core);
+    }
+
+    .tab-btn-label {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--text-tertiary);
+      transition: color 0.15s ease-out;
+    }
+
+    .tab-btn.active .tab-btn-label {
+      color: var(--amber-core);
+    }
+
+    /* ============================================
+       POST TAB
+       ============================================ */
+    .post-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      line-height: 1;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out;
+      -webkit-appearance: none;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: rgba(232, 163, 23, 0.3);
+      box-shadow: 0 0 0 3px rgba(232, 163, 23, 0.06);
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .form-textarea {
+      resize: none;
+      height: 80px;
+      line-height: 1.5;
+    }
+
+    .form-select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%235C5347' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .form-select option {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+    }
+
+    .usdc-input-wrapper {
+      position: relative;
+    }
+
+    .usdc-input-wrapper .form-input {
+      padding-left: 48px;
+      font-size: 18px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--amber-core);
+    }
+
+    .usdc-input-wrapper::before {
+      content: 'USDC';
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .tag-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag-option {
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-tertiary);
+    }
+
+    .tag-option:hover {
+      border-color: var(--border-hover);
+      color: var(--text-secondary);
+    }
+
+    .tag-option.selected {
+      border-color: rgba(232, 163, 23, 0.25);
+      background: rgba(232, 163, 23, 0.06);
+      color: var(--amber-core);
+    }
+
+    .tag-option:active {
+      transform: scale(0.96);
+    }
+
+    .post-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--amber-core), #D4941A);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      color: #1a1714;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .post-btn:hover {
+      box-shadow: 0 4px 20px rgba(232, 163, 23, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .post-btn:active {
+      transform: scale(0.98) translateY(0);
+    }
+
+    /* Subtle idle pulse on post CTA */
+    .post-btn-pulse {
+      animation: ctaPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes ctaPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.005); }
+    }
+
+    /* ============================================
+       MINE TAB
+       ============================================ */
+    .earnings-card {
+      background: var(--bg-surface-gradient);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .earnings-card::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(232, 163, 23, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .earnings-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .earnings-amount {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--amber-core);
+      text-shadow: 0 0 30px rgba(232, 163, 23, 0.25);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 12px;
+    }
+
+    .earnings-amount .currency {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-left: 4px;
+    }
+
+    .earnings-stats {
+      display: flex;
+      gap: 16px;
+    }
+
+    .earnings-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .earnings-stat-value {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .earnings-stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+    }
+
+    .section-header {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    .mine-task {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--bg-surface-gradient);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+      transition: all 0.15s ease-out;
+      cursor: pointer;
+    }
+
+    .mine-task:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-surface-hover);
+    }
+
+    .mine-task:active {
+      transform: scale(0.985);
+    }
+
+    .mine-task-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mine-task-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mine-task-meta {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .mine-task-amount {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--amber-core);
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 16px rgba(232, 163, 23, 0.2);
+      margin-left: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ============================================
+       JURY TAB
+       ============================================ */
+    .juror-panel {
+      background: var(--bg-surface-gradient);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .juror-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .juror-panel-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .juror-stake-badge {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--amber-core);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .juror-stats {
+      display: flex;
+      gap: 12px;
+    }
+
+    .juror-stat {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      background: rgba(20, 18, 16, 0.5);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .juror-stat-value {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 18px;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .juror-stat-label {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+    }
+
+    .dispute-card {
+      background: var(--bg-surface-gradient);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dispute-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--warm-red);
+    }
+
+    .dispute-card::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 30px;
+      background: linear-gradient(90deg, rgba(196, 84, 58, 0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .dispute-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-surface-hover);
+    }
+
+    .dispute-card:active {
+      transform: scale(0.985);
+    }
+
+    .dispute-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .dispute-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.3;
+      flex: 1;
+      margin-right: 8px;
+    }
+
+    .dispute-amount {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--amber-core);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .vote-bar-container {
+      margin-bottom: 8px;
+    }
+
+    .vote-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .vote-bar-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .vote-bar-label.approve { color: var(--sage); }
+    .vote-bar-label.reject { color: var(--warm-red); }
+
+    .vote-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(196, 84, 58, 0.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .vote-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--sage), rgba(122, 139, 111, 0.7));
+      transition: width 0.6s var(--spring);
+    }
+
+    .dispute-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dispute-time {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    .dispute-voters {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    .jury-history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--bg-surface-gradient);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+
+    .jury-history-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .jury-history-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .jury-history-result {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+
+    .jury-history-result.won { color: var(--sage); }
+    .jury-history-result.lost { color: var(--warm-red); }
+
+    .jury-history-reward {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    .jury-history-reward.positive { color: var(--sage); }
+    .jury-history-reward.negative { color: var(--warm-red); }
+
+    /* ============================================
+       BOTTOM SHEET
+       ============================================ */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(14, 13, 11, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out;
+    }
+
+    .sheet-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, #1e1b17 0%, #171412 100%);
+      border-top: 1px solid rgba(232, 163, 23, 0.15);
+      border-radius: 16px 16px 0 0;
+      z-index: 51;
+      transform: translateY(100%);
+      transition: transform 0.4s var(--spring);
+      max-height: 80%;
+      overflow-y: auto;
+    }
+
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0 6px;
+    }
+
+    .sheet-handle-bar {
+      width: 32px;
+      height: 3px;
+      border-radius: 3px;
+      background: rgba(232, 163, 23, 0.3);
+    }
+
+    .sheet-content {
+      padding: 0 20px 24px;
+    }
+
+    .sheet-amount {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 28px;
+      color: var(--amber-core);
+      text-shadow: 0 0 30px rgba(232, 163, 23, 0.3);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 4px;
+    }
+
+    .sheet-amount .currency {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-left: 4px;
+    }
+
+    .sheet-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 1.3;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .sheet-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .sheet-detail-cell {
+      background: var(--bg-surface);
+      padding: 12px 14px;
+    }
+
+    .sheet-detail-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+      line-height: 1;
+    }
+
+    .sheet-detail-value {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .sheet-description {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* Subtask hex indicators */
+    .sheet-subtasks {
+      margin-bottom: 20px;
+    }
+
+    .sheet-subtasks-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .hex-indicators {
+      display: flex;
+      gap: 5px;
+    }
+
+    .hex-indicator {
+      width: 18px;
+      height: 20px;
+      position: relative;
+    }
+
+    .hex-indicator.done svg { fill: var(--sage); stroke: none; }
+
+    .hex-indicator.pending svg { fill: none; stroke: var(--text-tertiary); stroke-width: 1.5; }
+
+    .hex-indicator svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .sheet-cta {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--amber-core), #D4941A);
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      color: #1a1714;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+    }
+
+    .sheet-cta:hover {
+      box-shadow: 0 4px 20px rgba(232, 163, 23, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .sheet-cta:active {
+      transform: scale(0.98) translateY(0);
+    }
+
+    /* ============================================
+       UTILITY
+       ============================================ */
+    .mt-16 { margin-top: 16px; }
+    .mb-8 { margin-bottom: 8px; }
+
+  </style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- Noise overlay is handled by .app::before -->
+
+  <!-- ==========================================
+       HEADER
+       ========================================== -->
+  <header class="header">
+    <div class="honeycomb-mesh">
+      <svg viewBox="0 0 500 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <pattern id="hexMesh" x="0" y="0" width="30" height="52" patternUnits="userSpaceOnUse">
+          <path d="M15 0L30 9V27L15 36L0 27V9Z" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+          <path d="M15 16L30 25V43L15 52L0 43V25Z" fill="none" stroke="#E8A317" stroke-width="0.5"/>
+        </pattern>
+        <rect width="500" height="80" fill="url(#hexMesh)"/>
+      </svg>
+    </div>
+
+    <div class="header-brand">
+      <div class="header-logo">
+        <!-- Multi-layered hex logo -->
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer hex - subtle -->
+          <path d="M18 2L32 10V26L18 34L4 26V10Z" fill="none" stroke="rgba(232,163,23,0.2)" stroke-width="0.75"/>
+          <!-- Middle hex -->
+          <path d="M18 5.5L29 12V24L18 30.5L7 24V12Z" fill="none" stroke="rgba(232,163,23,0.4)" stroke-width="1"/>
+          <!-- Inner hex - filled gradient -->
+          <defs>
+            <linearGradient id="hexGrad" x1="18" y1="9" x2="18" y2="27" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#F5C842"/>
+              <stop offset="100%" stop-color="#D4941A"/>
+            </linearGradient>
+          </defs>
+          <path d="M18 9L26 14V22L18 27L10 22V14Z" fill="url(#hexGrad)"/>
+          <!-- Center accent -->
+          <path d="M18 13L22 15.5V20.5L18 23L14 20.5V15.5Z" fill="#141210" opacity="0.3"/>
+        </svg>
+      </div>
+      <span class="header-title">HiveMind</span>
+    </div>
+
+    <div class="wallet-chip">
+      <span class="wallet-dot"></span>
+      <span>0x7a3...f2d1</span>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       STATS RIBBON
+       ========================================== -->
+  <div class="stats-ribbon">
+    <div class="stat-item">
+      <span class="stat-value" data-count="142">0</span>
+      <span class="stat-label">Tasks</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value amber" data-count="12840" data-prefix="$">$0</span>
+      <span class="stat-label">Pool</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value" data-count="89">0</span>
+      <span class="stat-label">Workers</span>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTENT AREA
+       ========================================== -->
+  <div class="content-area">
+
+    <!-- FEED TAB -->
+    <div class="tab-content active" id="tab-feed">
+      <div class="task-card" data-status="open" onclick="openSheet(0, event)">
+        <div class="task-card-top">
+          <span class="task-card-title">Build token-gated dashboard for DAO contributors</span>
+          <span class="task-card-amount">$450</span>
+        </div>
+        <div class="task-card-meta">
+          <div class="status-indicator">
+            <span class="status-dot" data-status="open"></span>
+            <span class="status-text" data-status="open">Open</span>
+          </div>
+          <span class="task-card-poster">0x8f2...a1c3</span>
+        </div>
+        <div class="task-card-tags">
+          <span class="tag tag-dev">Dev</span>
+          <span class="tag tag-design">Design</span>
+        </div>
+      </div>
+
+      <div class="task-card" data-status="claimed" onclick="openSheet(1, event)">
+        <div class="task-card-top">
+          <span class="task-card-title">Audit swap router contract for edge cases</span>
+          <span class="task-card-amount">$1,200</span>
+        </div>
+        <div class="task-card-meta">
+          <div class="status-indicator">
+            <span class="status-dot" data-status="claimed"></span>
+            <span class="status-text" data-status="claimed">Claimed</span>
+          </div>
+          <span class="task-card-poster">0x3d1...e7b2</span>
+        </div>
+        <div class="task-card-tags">
+          <span class="tag tag-audit">Audit</span>
+          <span class="tag tag-dev">Dev</span>
+        </div>
+      </div>
+
+      <div class="task-card" data-status="disputed" onclick="openSheet(2, event)">
+        <div class="task-card-top">
+          <span class="task-card-title">Write onboarding guide for new protocol users</span>
+          <span class="task-card-amount">$180</span>
+        </div>
+        <div class="task-card-meta">
+          <div class="status-indicator">
+            <span class="status-dot" data-status="disputed"></span>
+            <span class="status-text" data-status="disputed">Disputed</span>
+          </div>
+          <span class="task-card-poster">0xa5c...9f41</span>
+        </div>
+        <div class="task-card-tags">
+          <span class="tag tag-content">Content</span>
+        </div>
+      </div>
+
+      <div class="task-card" data-status="review" onclick="openSheet(3, event)">
+        <div class="task-card-top">
+          <span class="task-card-title">Research L2 bridging costs for treasury diversification</span>
+          <span class="task-card-amount">$320</span>
+        </div>
+        <div class="task-card-meta">
+          <div class="status-indicator">
+            <span class="status-dot" data-status="review"></span>
+            <span class="status-text" data-status="review">In Review</span>
+          </div>
+          <span class="task-card-poster">0x1b7...d5e8</span>
+        </div>
+        <div class="task-card-tags">
+          <span class="tag tag-research">Research</span>
+        </div>
+      </div>
+
+      <div class="task-card" data-status="complete" onclick="openSheet(4, event)">
+        <div class="task-card-top">
+          <span class="task-card-title">Design community engagement rewards system</span>
+          <span class="task-card-amount">$600</span>
+        </div>
+        <div class="task-card-meta">
+          <div class="status-indicator">
+            <span class="status-dot" data-status="complete"></span>
+            <span class="status-text" data-status="complete">Complete</span>
+          </div>
+          <span class="task-card-poster">0xc4e...2a87</span>
+        </div>
+        <div class="task-card-tags">
+          <span class="tag tag-community">Community</span>
+          <span class="tag tag-design">Design</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- POST TAB -->
+    <div class="tab-content" id="tab-post">
+      <div class="post-form">
+        <div class="form-group">
+          <label class="form-label">Task Title</label>
+          <input type="text" class="form-input" placeholder="What needs to get done?">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" placeholder="Describe the deliverables, requirements, and acceptance criteria..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Bounty</label>
+            <div class="usdc-input-wrapper">
+              <input type="text" class="form-input" placeholder="0.00" value="250">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deadline</label>
+            <input type="text" class="form-input" placeholder="7 days" value="14 days">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select">
+            <option>Development</option>
+            <option>Design</option>
+            <option>Content</option>
+            <option>Research</option>
+            <option>Audit</option>
+            <option>Community</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tags</label>
+          <div class="tag-selector">
+            <span class="tag-option selected" onclick="this.classList.toggle('selected')">Dev</span>
+            <span class="tag-option" onclick="this.classList.toggle('selected')">Design</span>
+            <span class="tag-option" onclick="this.classList.toggle('selected')">Content</span>
+            <span class="tag-option" onclick="this.classList.toggle('selected')">Research</span>
+            <span class="tag-option selected" onclick="this.classList.toggle('selected')">Audit</span>
+            <span class="tag-option" onclick="this.classList.toggle('selected')">Community</span>
+          </div>
+        </div>
+
+        <button class="post-btn post-btn-pulse">Post Task to Hive</button>
+      </div>
+    </div>
+
+    <!-- MINE TAB -->
+    <div class="tab-content" id="tab-mine">
+      <div class="earnings-card">
+        <div class="earnings-label">Total Earned</div>
+        <div class="earnings-amount">2,840<span class="currency">USDC</span></div>
+        <div class="earnings-stats">
+          <div class="earnings-stat">
+            <span class="earnings-stat-value">14</span>
+            <span class="earnings-stat-label">Completed</span>
+          </div>
+          <div class="earnings-stat">
+            <span class="earnings-stat-value">98%</span>
+            <span class="earnings-stat-label">Approval</span>
+          </div>
+          <div class="earnings-stat">
+            <span class="earnings-stat-value">4.2d</span>
+            <span class="earnings-stat-label">Avg Time</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">Active (2)</div>
+      <div class="mine-task">
+        <div class="mine-task-info">
+          <div class="mine-task-title">Audit swap router contract</div>
+          <div class="mine-task-meta">Due in 5 days</div>
+        </div>
+        <span class="mine-task-amount">$1,200</span>
+      </div>
+      <div class="mine-task">
+        <div class="mine-task-info">
+          <div class="mine-task-title">Build notification service for events</div>
+          <div class="mine-task-meta">Due in 12 days</div>
+        </div>
+        <span class="mine-task-amount">$380</span>
+      </div>
+
+      <div class="section-header mt-16">Completed (3)</div>
+      <div class="mine-task">
+        <div class="mine-task-info">
+          <div class="mine-task-title">Design rewards system</div>
+          <div class="mine-task-meta">Paid 2 days ago</div>
+        </div>
+        <span class="mine-task-amount">$600</span>
+      </div>
+      <div class="mine-task">
+        <div class="mine-task-info">
+          <div class="mine-task-title">Implement staking UI components</div>
+          <div class="mine-task-meta">Paid 8 days ago</div>
+        </div>
+        <span class="mine-task-amount">$520</span>
+      </div>
+      <div class="mine-task">
+        <div class="mine-task-info">
+          <div class="mine-task-title">Write API documentation</div>
+          <div class="mine-task-meta">Paid 15 days ago</div>
+        </div>
+        <span class="mine-task-amount">$140</span>
+      </div>
+    </div>
+
+    <!-- JURY TAB -->
+    <div class="tab-content" id="tab-jury">
+      <div class="juror-panel">
+        <div class="juror-panel-header">
+          <span class="juror-panel-title">Juror Status</span>
+          <span class="juror-stake-badge">250 USDC staked</span>
+        </div>
+        <div class="juror-stats">
+          <div class="juror-stat">
+            <div class="juror-stat-value">23</div>
+            <div class="juror-stat-label">Cases</div>
+          </div>
+          <div class="juror-stat">
+            <div class="juror-stat-value">91%</div>
+            <div class="juror-stat-label">Accuracy</div>
+          </div>
+          <div class="juror-stat">
+            <div class="juror-stat-value">$84</div>
+            <div class="juror-stat-label">Earned</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">Active Disputes (2)</div>
+
+      <div class="dispute-card">
+        <div class="dispute-header">
+          <span class="dispute-title">Onboarding guide quality dispute</span>
+          <span class="dispute-amount">$180</span>
+        </div>
+        <div class="vote-bar-container">
+          <div class="vote-bar-labels">
+            <span class="vote-bar-label approve">Approve 62%</span>
+            <span class="vote-bar-label reject">Reject 38%</span>
+          </div>
+          <div class="vote-bar">
+            <div class="vote-bar-fill" style="width: 62%"></div>
+          </div>
+        </div>
+        <div class="dispute-meta">
+          <span class="dispute-time">18h remaining</span>
+          <span class="dispute-voters">8/12 voted</span>
+        </div>
+      </div>
+
+      <div class="dispute-card">
+        <div class="dispute-header">
+          <span class="dispute-title">NFT minting contract incomplete deliverable</span>
+          <span class="dispute-amount">$750</span>
+        </div>
+        <div class="vote-bar-container">
+          <div class="vote-bar-labels">
+            <span class="vote-bar-label approve">Approve 35%</span>
+            <span class="vote-bar-label reject">Reject 65%</span>
+          </div>
+          <div class="vote-bar">
+            <div class="vote-bar-fill" style="width: 35%"></div>
+          </div>
+        </div>
+        <div class="dispute-meta">
+          <span class="dispute-time">2d remaining</span>
+          <span class="dispute-voters">5/12 voted</span>
+        </div>
+      </div>
+
+      <div class="section-header mt-16">History</div>
+
+      <div class="jury-history-item">
+        <div class="jury-history-info">
+          <div class="jury-history-title">API integration scope dispute</div>
+          <div class="jury-history-result won">Majority side</div>
+        </div>
+        <span class="jury-history-reward positive">+$4.20</span>
+      </div>
+
+      <div class="jury-history-item">
+        <div class="jury-history-info">
+          <div class="jury-history-title">Design deliverable dispute</div>
+          <div class="jury-history-result lost">Minority side</div>
+        </div>
+        <span class="jury-history-reward negative">-$2.10</span>
+      </div>
+
+      <div class="jury-history-item">
+        <div class="jury-history-info">
+          <div class="jury-history-title">Smart contract audit quality</div>
+          <div class="jury-history-result won">Majority side</div>
+        </div>
+        <span class="jury-history-reward positive">+$6.50</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       BOTTOM SHEET
+       ========================================== -->
+  <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle">
+      <div class="sheet-handle-bar"></div>
+    </div>
+    <div class="sheet-content" id="sheetContent">
+      <!-- Dynamic content -->
+    </div>
+  </div>
+
+  <!-- ==========================================
+       TAB BAR
+       ========================================== -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="feed" onclick="switchTab('feed')">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Hex grid icon -->
+        <path d="M10 2L16 5.5V12.5L10 16L4 12.5V5.5Z"/>
+        <path d="M10 2V8M16 5.5L10 8M4 5.5L10 8"/>
+        <line x1="4" y1="12.5" x2="10" y2="16"/>
+        <line x1="16" y1="12.5" x2="10" y2="16"/>
+      </svg>
+      <span class="tab-btn-label">Feed</span>
+    </button>
+    <button class="tab-btn" data-tab="post" onclick="switchTab('post')">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Hex with plus -->
+        <path d="M10 3L17 7V13L10 17L3 13V7Z"/>
+        <line x1="10" y1="8" x2="10" y2="12"/>
+        <line x1="8" y1="10" x2="12" y2="10"/>
+      </svg>
+      <span class="tab-btn-label">Post</span>
+    </button>
+    <button class="tab-btn" data-tab="mine" onclick="switchTab('mine')">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Hex with user -->
+        <path d="M10 3L17 7V13L10 17L3 13V7Z"/>
+        <circle cx="10" cy="8.5" r="2"/>
+        <path d="M6.5 14C6.5 11.5 8 10.5 10 10.5C12 10.5 13.5 11.5 13.5 14"/>
+      </svg>
+      <span class="tab-btn-label">Mine</span>
+    </button>
+    <button class="tab-btn" data-tab="jury" onclick="switchTab('jury')">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Hex with scales -->
+        <path d="M10 3L17 7V13L10 17L3 13V7Z"/>
+        <line x1="10" y1="7" x2="10" y2="14"/>
+        <line x1="6.5" y1="9" x2="13.5" y2="9"/>
+        <path d="M5.5 9L6.5 12H8.5L7.5 9"/>
+        <path d="M12.5 9L11.5 12H13.5L14.5 9"/>
+      </svg>
+      <span class="tab-btn-label">Jury</span>
+    </button>
+  </nav>
+
+</div>
+
+<script>
+  // ============================================
+  // TASK DATA
+  // ============================================
+  const tasks = [
+    {
+      title: 'Build token-gated dashboard for DAO contributors',
+      amount: '$450',
+      status: 'open',
+      statusLabel: 'Open',
+      poster: '0x8f2...a1c3',
+      deadline: '7 days',
+      category: 'Development',
+      description: 'Create a responsive dashboard that gates access via NFT ownership verification. Must integrate with existing smart contracts and support wallet connect. Include analytics panel for contributor activity.',
+      subtasks: [true, true, false, false, false],
+      tags: ['Dev', 'Design']
+    },
+    {
+      title: 'Audit swap router contract for edge cases',
+      amount: '$1,200',
+      status: 'claimed',
+      statusLabel: 'Claimed',
+      poster: '0x3d1...e7b2',
+      deadline: '10 days',
+      category: 'Audit',
+      description: 'Full security audit of the swap router including slippage protection, reentrancy guards, and price oracle manipulation vectors. Deliver a written report with severity ratings and suggested fixes.',
+      subtasks: [true, true, true, false, false, false],
+      tags: ['Audit', 'Dev']
+    },
+    {
+      title: 'Write onboarding guide for new protocol users',
+      amount: '$180',
+      status: 'disputed',
+      statusLabel: 'Disputed',
+      poster: '0xa5c...9f41',
+      deadline: '5 days',
+      category: 'Content',
+      description: 'Comprehensive onboarding guide covering wallet setup, first transaction, staking, and governance participation. Must include screenshots and step-by-step instructions for both desktop and mobile.',
+      subtasks: [true, true, true, true, false],
+      tags: ['Content']
+    },
+    {
+      title: 'Research L2 bridging costs for treasury diversification',
+      amount: '$320',
+      status: 'review',
+      statusLabel: 'In Review',
+      poster: '0x1b7...d5e8',
+      deadline: '14 days',
+      category: 'Research',
+      description: 'Comparative analysis of bridging costs across Arbitrum, Optimism, Base, and zkSync for treasury operations. Include gas cost projections, security tradeoffs, and recommended bridging strategy.',
+      subtasks: [true, true, true, true, true, false],
+      tags: ['Research']
+    },
+    {
+      title: 'Design community engagement rewards system',
+      amount: '$600',
+      status: 'complete',
+      statusLabel: 'Complete',
+      poster: '0xc4e...2a87',
+      deadline: 'Completed',
+      category: 'Design',
+      description: 'Full design system for gamified community rewards including reputation scores, achievement badges, and tier progression. Deliverables include Figma file, component specs, and animation guidelines.',
+      subtasks: [true, true, true, true, true],
+      tags: ['Community', 'Design']
+    }
+  ];
+
+  // ============================================
+  // TAB SWITCHING
+  // ============================================
+  let currentTab = 'feed';
+  const tabOrder = ['feed', 'post', 'mine', 'jury'];
+
+  function switchTab(tabId) {
+    if (tabId === currentTab) return;
+
+    const oldIndex = tabOrder.indexOf(currentTab);
+    const newIndex = tabOrder.indexOf(tabId);
+    const goingRight = newIndex > oldIndex;
+
+    // Update buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    // Reset ALL tabs first - clean slate
+    document.querySelectorAll('.tab-content').forEach(tc => {
+      tc.classList.remove('active', 'exit-left');
+      tc.style.cssText = '';
+    });
+
+    const oldContent = document.getElementById('tab-' + currentTab);
+    const newContent = document.getElementById('tab-' + tabId);
+
+    // Position old for exit
+    oldContent.style.opacity = '0';
+    oldContent.style.transform = goingRight ? 'translateX(-16px)' : 'translateX(16px)';
+    oldContent.style.pointerEvents = 'none';
+
+    // Stage new off-screen
+    newContent.style.transition = 'none';
+    newContent.style.opacity = '0';
+    newContent.style.transform = goingRight ? 'translateX(16px)' : 'translateX(-16px)';
+    newContent.style.pointerEvents = 'none';
+
+    // Force reflow, then animate in
+    newContent.offsetHeight;
+    newContent.style.transition = '';
+    newContent.classList.add('active');
+
+    // Stagger card entrance on feed
+    if (tabId === 'feed') {
+      setTimeout(staggerCards, 50);
+    }
+
+    currentTab = tabId;
+  }
+
+  // ============================================
+  // BOTTOM SHEET
+  // ============================================
+  function openSheet(index, event) {
+    if (event) event.stopPropagation();
+    const task = tasks[index];
+    const backdrop = document.getElementById('sheetBackdrop');
+    const sheet = document.getElementById('bottomSheet');
+    const content = document.getElementById('sheetContent');
+
+    // Build subtask hex indicators (SVG-based for proper outline rendering)
+    const hexSvg = `<svg viewBox="0 0 18 20"><polygon points="9,1 17,5 17,15 9,19 1,15 1,5"/></svg>`;
+    const hexes = task.subtasks.map(done =>
+      `<div class="hex-indicator ${done ? 'done' : 'pending'}">${hexSvg}</div>`
+    ).join('');
+
+    const ctaText = {
+      'open': 'Claim This Task',
+      'claimed': 'Submit Deliverable',
+      'disputed': 'View Dispute',
+      'review': 'Awaiting Review',
+      'complete': 'View Deliverable'
+    };
+
+    content.innerHTML = `
+      <div class="sheet-amount">${task.amount}<span class="currency">USDC</span></div>
+      <div class="sheet-title">${task.title}</div>
+      <div class="sheet-detail-grid">
+        <div class="sheet-detail-cell">
+          <div class="sheet-detail-label">Status</div>
+          <div class="sheet-detail-value" style="color: ${getStatusColor(task.status)}">${task.statusLabel}</div>
+        </div>
+        <div class="sheet-detail-cell">
+          <div class="sheet-detail-label">Category</div>
+          <div class="sheet-detail-value">${task.category}</div>
+        </div>
+        <div class="sheet-detail-cell">
+          <div class="sheet-detail-label">Deadline</div>
+          <div class="sheet-detail-value">${task.deadline}</div>
+        </div>
+        <div class="sheet-detail-cell">
+          <div class="sheet-detail-label">Posted by</div>
+          <div class="sheet-detail-value" style="font-variant-numeric: tabular-nums; font-size: 11px;">${task.poster}</div>
+        </div>
+      </div>
+      <div class="sheet-description">${task.description}</div>
+      <div class="sheet-subtasks">
+        <div class="sheet-subtasks-label">Progress (${task.subtasks.filter(Boolean).length}/${task.subtasks.length} subtasks)</div>
+        <div class="hex-indicators">${hexes}</div>
+      </div>
+      <button class="sheet-cta">${ctaText[task.status]}</button>
+    `;
+
+    // Small delay to prevent click-through from card
+    requestAnimationFrame(() => {
+      backdrop.classList.add('open');
+      sheet.classList.add('open');
+    });
+  }
+
+  function closeSheet() {
+    document.getElementById('sheetBackdrop').classList.remove('open');
+    document.getElementById('bottomSheet').classList.remove('open');
+  }
+
+  function getStatusColor(status) {
+    const colors = {
+      'open': '#E8A317',
+      'claimed': '#7A8B6F',
+      'disputed': '#C4543A',
+      'review': '#7B8EC4',
+      'complete': '#7A8B6F'
+    };
+    return colors[status] || '#9B8E7B';
+  }
+
+  // ============================================
+  // STAGGER CARD ENTRANCE
+  // ============================================
+  function staggerCards() {
+    const cards = document.querySelectorAll('#tab-feed .task-card');
+    cards.forEach((card, i) => {
+      card.classList.remove('visible');
+      card.style.transitionDelay = '0ms';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.style.transitionDelay = `${i * 50}ms`;
+          card.style.transition = `opacity 0.35s ease-out ${i * 50}ms, transform 0.4s cubic-bezier(0.32, 0.72, 0, 1) ${i * 50}ms`;
+          card.classList.add('visible');
+        });
+      });
+    });
+  }
+
+  // ============================================
+  // COUNT-UP ANIMATION
+  // ============================================
+  function animateCountUp() {
+    const counters = document.querySelectorAll('.stat-value[data-count]');
+    counters.forEach(el => {
+      const target = parseInt(el.dataset.count, 10);
+      const prefix = el.dataset.prefix || '';
+      const duration = 800;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(eased * target);
+
+        if (prefix === '$') {
+          el.textContent = '$' + current.toLocaleString();
+        } else {
+          el.textContent = current.toLocaleString();
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      }
+
+      requestAnimationFrame(update);
+    });
+  }
+
+  // ============================================
+  // INIT
+  // ============================================
+  window.addEventListener('DOMContentLoaded', () => {
+    // Stagger initial cards
+    setTimeout(staggerCards, 100);
+
+    // Count up stats
+    setTimeout(animateCountUp, 200);
+
+    // Close sheet on escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeSheet();
+    });
+
+    // Swipe to close bottom sheet
+    let touchStartY = 0;
+    const sheet = document.getElementById('bottomSheet');
+    sheet.addEventListener('touchstart', e => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    sheet.addEventListener('touchmove', e => {
+      const diff = e.touches[0].clientY - touchStartY;
+      if (diff > 60) closeSheet();
+    }, { passive: true });
+  });
+</script>
+
+</body>
+</html>

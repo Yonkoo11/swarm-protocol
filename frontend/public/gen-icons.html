@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><body>
+<canvas id="c1" width="1024" height="1024"></canvas>
+<canvas id="c2" width="200" height="200"></canvas>
+<script>
+function drawHex(ctx, cx, cy, r) {
+  ctx.beginPath();
+  for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));}
+  ctx.closePath();
+}
+function drawIcon(canvas, size) {
+  const ctx = canvas.getContext('2d');
+  const c = size/2;
+  ctx.fillStyle = '#141210';
+  ctx.fillRect(0,0,size,size);
+  // Outer hex
+  drawHex(ctx,c,c,size*0.42);
+  ctx.strokeStyle = 'rgba(232,163,23,0.2)';
+  ctx.lineWidth = size*0.008;
+  ctx.stroke();
+  // Middle hex
+  drawHex(ctx,c,c,size*0.32);
+  ctx.strokeStyle = 'rgba(232,163,23,0.4)';
+  ctx.lineWidth = size*0.008;
+  ctx.stroke();
+  // Inner hex filled
+  drawHex(ctx,c,c,size*0.22);
+  const g = ctx.createLinearGradient(c-size*0.2,c-size*0.2,c+size*0.2,c+size*0.2);
+  g.addColorStop(0,'#E8A317');
+  g.addColorStop(1,'#F5C842');
+  ctx.fillStyle = g;
+  ctx.fill();
+  // Center hex cutout
+  drawHex(ctx,c,c,size*0.08);
+  ctx.fillStyle = '#141210';
+  ctx.fill();
+}
+drawIcon(document.getElementById('c1'), 1024);
+drawIcon(document.getElementById('c2'), 200);
+// Download links
+document.body.innerHTML += '<br><a id="d1" download="icon-1024.png">Download 1024</a> <a id="d2" download="splash-200.png">Download 200</a>';
+document.getElementById('d1').href = document.getElementById('c1').toDataURL('image/png');
+document.getElementById('d2').href = document.getElementById('c2').toDataURL('image/png');
+</script>
+</body></html>

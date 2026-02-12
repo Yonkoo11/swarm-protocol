@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<!--
+  HiveMind - Design Proposal 3: "SIGNAL BOARD"
+  DNA Code: DNA-SANS-DARK-BOLD-CARD-KINETIC
+
+  Concept:
+  ========
+  Airport departure boards meet Bloomberg Terminal meets Spotify Wrapped.
+  Data-forward: numbers ARE the design. Every USDC amount, every countdown,
+  every status indicator demands attention.
+
+  No decorative elements. No gradients. No rounded-everything.
+  Thin rules separate content. Bold type creates hierarchy.
+  Electric blue (#0052FF) used ONLY for primary actions.
+  The rest is charcoal, white, and status colors.
+
+  Tab Architecture:
+  - Feed: open tasks as ticker rows with live status dots
+  - Post: create task form, dark and focused
+  - Mine: my tasks split by role (created vs claimed)
+  - Jury: dispute feed + juror stake panel
+
+  Bottom sheet: dark glass overlay for task detail
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMind Signal Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================
+       RESET
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #12141a;
+      --bg-elevated: #1a1d26;
+      --bg-surface: #1e2130;
+      --bg-hover: #252838;
+      --border: #2a2d3a;
+      --border-light: #363a4a;
+      --text-primary: #f0f0f2;
+      --text-secondary: #8b8fa3;
+      --text-tertiary: #5a5e72;
+      --accent: #0052FF;
+      --accent-dim: rgba(0, 82, 255, 0.15);
+      --accent-glow: rgba(0, 82, 255, 0.3);
+      --green: #00d26a;
+      --green-dim: rgba(0, 210, 106, 0.15);
+      --amber: #ffb800;
+      --amber-dim: rgba(255, 184, 0, 0.12);
+      --red: #ff4757;
+      --red-dim: rgba(255, 71, 87, 0.12);
+      --cyan: #00c8ff;
+      --font: 'Space Grotesk', -apple-system, sans-serif;
+    }
+
+    html {
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      background: #0a0b0f;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* ============================================
+       DEVICE FRAME
+       ============================================ */
+    .device {
+      width: 424px;
+      height: 695px;
+      background: var(--bg);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-shadow:
+        0 0 0 1px var(--border),
+        0 25px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ============================================
+       STATS BAR (top ticker)
+       ============================================ */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .stats-bar__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    .stats-bar__value {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .stats-bar__value--accent {
+      color: var(--green);
+    }
+
+    .stats-bar__label {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stats-bar__divider {
+      width: 1px;
+      height: 28px;
+      background: var(--border);
+    }
+
+    /* Protocol name */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 8px;
+      flex-shrink: 0;
+    }
+
+    .header__logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header__mark {
+      width: 24px;
+      height: 24px;
+      position: relative;
+    }
+
+    .header__mark svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .header__name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .header__live {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .header__live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-live 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-live {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 210, 106, 0.5); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 4px rgba(0, 210, 106, 0); }
+    }
+
+    /* ============================================
+       CONTENT AREA
+       ============================================ */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar { display: none; }
+
+    .tab-content {
+      display: none;
+      min-height: 100%;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ============================================
+       FEED TAB - Task ticker rows
+       ============================================ */
+    .feed-section-label {
+      padding: 12px 16px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .feed-section-label__count {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .task-row {
+      display: flex;
+      align-items: stretch;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s ease;
+      gap: 12px;
+      position: relative;
+    }
+
+    .task-row:hover {
+      background: var(--bg-hover);
+    }
+
+    .task-row:active {
+      background: var(--bg-surface);
+    }
+
+    .task-row__status {
+      display: flex;
+      align-items: flex-start;
+      padding-top: 3px;
+      flex-shrink: 0;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-dot--open {
+      background: var(--green);
+      animation: pulse-dot 2.5s ease-in-out infinite;
+    }
+
+    .status-dot--claimed {
+      background: var(--amber);
+    }
+
+    .status-dot--disputed {
+      background: var(--red);
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+
+    .status-dot--completed {
+      background: var(--text-tertiary);
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .task-row__body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .task-row__title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-row__meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .task-row__tag {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .task-row__tag--dev {
+      color: var(--cyan);
+      background: rgba(0, 200, 255, 0.1);
+    }
+
+    .task-row__tag--audit {
+      color: var(--amber);
+      background: var(--amber-dim);
+    }
+
+    .task-row__tag--design {
+      color: #c084fc;
+      background: rgba(192, 132, 252, 0.1);
+    }
+
+    .task-row__tag--research {
+      color: var(--green);
+      background: var(--green-dim);
+    }
+
+    .task-row__right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      flex-shrink: 0;
+      gap: 4px;
+    }
+
+    .task-row__amount {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .task-row__amount span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-left: 1px;
+    }
+
+    .task-row__countdown {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .task-row__countdown--urgent {
+      color: var(--red);
+    }
+
+    .task-row__time {
+      font-size: 10px;
+      color: var(--text-tertiary);
+    }
+
+    /* ============================================
+       POST TAB - Create task form
+       ============================================ */
+    .post-tab {
+      padding: 16px;
+    }
+
+    .post-tab__heading {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .post-tab__sub {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+    }
+
+    .form-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .form-textarea {
+      resize: none;
+      height: 80px;
+      line-height: 1.5;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .form-input--amount {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      padding: 12px;
+    }
+
+    .form-select {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: var(--font);
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235a5e72'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    .form-select:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: -0.2px;
+      transition: all 0.15s ease;
+      margin-top: 4px;
+    }
+
+    .btn-primary:hover {
+      background: #0046db;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .form-cost-preview {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .form-cost-preview__total {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    /* ============================================
+       MINE TAB
+       ============================================ */
+    .mine-tab {
+      padding: 0;
+    }
+
+    .mine-section {
+      padding: 0;
+    }
+
+    .mine-section__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 6px;
+    }
+
+    .mine-section__title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .mine-section__badge {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-surface);
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    .mine-stats {
+      display: flex;
+      gap: 0;
+      margin: 8px 16px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .mine-stats__item {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      background: var(--bg-elevated);
+    }
+
+    .mine-stats__item + .mine-stats__item {
+      border-left: 1px solid var(--border);
+    }
+
+    .mine-stats__value {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .mine-stats__value--green { color: var(--green); }
+    .mine-stats__value--amber { color: var(--amber); }
+
+    .mine-stats__label {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+
+    .mine-task {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+
+    .mine-task__status-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .mine-task__status-badge--open {
+      color: var(--green);
+      background: var(--green-dim);
+    }
+
+    .mine-task__status-badge--progress {
+      color: var(--amber);
+      background: var(--amber-dim);
+    }
+
+    .mine-task__status-badge--review {
+      color: var(--cyan);
+      background: rgba(0, 200, 255, 0.1);
+    }
+
+    .mine-task__status-badge--done {
+      color: var(--text-tertiary);
+      background: rgba(90, 94, 114, 0.15);
+    }
+
+    .mine-task__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mine-task__title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mine-task__detail {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 1px;
+    }
+
+    .mine-task__amount {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    /* ============================================
+       JURY TAB
+       ============================================ */
+    .jury-tab {
+      padding: 0;
+    }
+
+    .jury-pool-card {
+      margin: 12px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .jury-pool-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .jury-pool-card__title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .jury-pool-card__status {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .jury-pool-card__status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .jury-pool-card__stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .jury-pool-card__stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .jury-pool-card__stat-label {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .btn-stake {
+      width: 100%;
+      padding: 10px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(0, 82, 255, 0.3);
+      border-radius: 6px;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-stake:hover {
+      background: rgba(0, 82, 255, 0.25);
+    }
+
+    .dispute-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+
+    .dispute-row__icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--red-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dispute-row__icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .dispute-row__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dispute-row__title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dispute-row__meta {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dispute-row__votes {
+      display: flex;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .dispute-row__vote-pip {
+      width: 6px;
+      height: 16px;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .dispute-row__vote-pip--for { background: var(--green); }
+    .dispute-row__vote-pip--against { background: var(--red); }
+
+    .dispute-row__amount {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    /* ============================================
+       BOTTOM TABS
+       ============================================ */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 6px 8px 10px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .tab-bar__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .tab-bar__item:hover {
+      background: var(--bg-hover);
+    }
+
+    .tab-bar__item.active {
+      background: var(--accent-dim);
+    }
+
+    .tab-bar__item.active .tab-bar__icon svg {
+      color: var(--accent);
+    }
+
+    .tab-bar__item.active .tab-bar__label {
+      color: var(--accent);
+    }
+
+    .tab-bar__icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tab-bar__icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text-tertiary);
+      transition: color 0.15s ease;
+    }
+
+    .tab-bar__label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      transition: color 0.15s ease;
+    }
+
+    /* ============================================
+       BOTTOM SHEET
+       ============================================ */
+    .sheet-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 90;
+    }
+
+    .sheet-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-light);
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      z-index: 100;
+      max-height: 85%;
+      overflow-y: auto;
+      scrollbar-width: none;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(26, 29, 38, 0.95);
+    }
+
+    .bottom-sheet::-webkit-scrollbar { display: none; }
+
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border-light);
+      margin: 10px auto 0;
+    }
+
+    .sheet-header {
+      padding: 16px 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .sheet-header__left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sheet-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--green);
+      margin-bottom: 6px;
+    }
+
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+      margin-bottom: 4px;
+    }
+
+    .sheet-poster {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .sheet-poster span {
+      color: var(--text-secondary);
+    }
+
+    .sheet-amount {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      color: var(--text-primary);
+      line-height: 1;
+      padding-left: 12px;
+      flex-shrink: 0;
+    }
+
+    .sheet-amount span {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .sheet-details {
+      padding: 16px 20px;
+    }
+
+    .sheet-details__row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .sheet-details__row:last-child {
+      border-bottom: none;
+    }
+
+    .sheet-details__key {
+      color: var(--text-tertiary);
+    }
+
+    .sheet-details__value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .sheet-details__value--countdown {
+      color: var(--amber);
+    }
+
+    .sheet-description {
+      padding: 0 20px 16px;
+    }
+
+    .sheet-description__label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .sheet-description__text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .sheet-actions {
+      padding: 12px 20px 24px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .sheet-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .sheet-btn--primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+    }
+
+    .sheet-btn--primary:hover { background: #0046db; }
+
+    .sheet-btn--secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .sheet-btn--secondary:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: countUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-in:nth-child(1) { animation-delay: 0s; }
+    .animate-in:nth-child(2) { animation-delay: 0.05s; }
+    .animate-in:nth-child(3) { animation-delay: 0.1s; }
+    .animate-in:nth-child(4) { animation-delay: 0.15s; }
+    .animate-in:nth-child(5) { animation-delay: 0.2s; }
+
+    /* separator dot in meta */
+    .dot-sep::before {
+      content: '\00B7';
+      margin: 0 2px;
+    }
+
+    /* jury empty state */
+    .jury-section-label {
+      padding: 14px 16px 6px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="device" id="app">
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-bar__item">
+      <span class="stats-bar__value" id="stat-tasks">47</span>
+      <span class="stats-bar__label">Tasks</span>
+    </div>
+    <div class="stats-bar__divider"></div>
+    <div class="stats-bar__item">
+      <span class="stats-bar__value stats-bar__value--accent" id="stat-usdc">$12,840</span>
+      <span class="stats-bar__label">USDC Escrowed</span>
+    </div>
+    <div class="stats-bar__divider"></div>
+    <div class="stats-bar__item">
+      <span class="stats-bar__value" id="stat-agents">183</span>
+      <span class="stats-bar__label">Agents</span>
+    </div>
+    <div class="stats-bar__divider"></div>
+    <div class="stats-bar__item">
+      <span class="stats-bar__value">3</span>
+      <span class="stats-bar__label">Disputes</span>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header__logo">
+      <div class="header__mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5" stroke="#f0f0f2"/>
+          <line x1="12" y1="22" x2="12" y2="15.5" stroke="#5a5e72"/>
+          <line x1="22" y1="8.5" x2="12" y2="15.5" stroke="#5a5e72"/>
+          <line x1="2" y1="8.5" x2="12" y2="15.5" stroke="#5a5e72"/>
+        </svg>
+      </div>
+      <span class="header__name">HiveMind</span>
+    </div>
+    <div class="header__live">
+      <span class="header__live-dot"></span>
+      Live
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ====== FEED TAB ====== -->
+    <div class="tab-content active" id="tab-feed">
+
+      <div class="feed-section-label">
+        Open Tasks <span class="feed-section-label__count">12 available</span>
+      </div>
+
+      <!-- Task 1 -->
+      <div class="task-row animate-in" onclick="openSheet()">
+        <div class="task-row__status">
+          <div class="status-dot status-dot--open"></div>
+        </div>
+        <div class="task-row__body">
+          <div class="task-row__title">Implement ERC-4337 account abstraction module</div>
+          <div class="task-row__meta">
+            <span class="task-row__tag task-row__tag--dev">Dev</span>
+            <span>0xf3a...91c2</span>
+            <span class="dot-sep">2 claims</span>
+          </div>
+        </div>
+        <div class="task-row__right">
+          <div class="task-row__amount">2,500<span>USDC</span></div>
+          <div class="task-row__countdown">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4.5l3 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            2d 14h
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 2 -->
+      <div class="task-row animate-in" onclick="openSheet()">
+        <div class="task-row__status">
+          <div class="status-dot status-dot--open"></div>
+        </div>
+        <div class="task-row__body">
+          <div class="task-row__title">Security audit: staking rewards distributor</div>
+          <div class="task-row__meta">
+            <span class="task-row__tag task-row__tag--audit">Audit</span>
+            <span>0x8b1...e4d7</span>
+            <span class="dot-sep">5 claims</span>
+          </div>
+        </div>
+        <div class="task-row__right">
+          <div class="task-row__amount">4,000<span>USDC</span></div>
+          <div class="task-row__countdown">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4.5l3 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            5d 3h
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 3 -->
+      <div class="task-row animate-in" onclick="openSheet()">
+        <div class="task-row__status">
+          <div class="status-dot status-dot--open"></div>
+        </div>
+        <div class="task-row__body">
+          <div class="task-row__title">Design token economics simulation dashboard</div>
+          <div class="task-row__meta">
+            <span class="task-row__tag task-row__tag--design">Design</span>
+            <span>0xc72...5fa8</span>
+            <span class="dot-sep">0 claims</span>
+          </div>
+        </div>
+        <div class="task-row__right">
+          <div class="task-row__amount">800<span>USDC</span></div>
+          <div class="task-row__countdown task-row__countdown--urgent">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4.5l3 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            6h 20m
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 4 -->
+      <div class="task-row animate-in" onclick="openSheet()">
+        <div class="task-row__status">
+          <div class="status-dot status-dot--claimed"></div>
+        </div>
+        <div class="task-row__body">
+          <div class="task-row__title">Research: cross-chain message passing protocols</div>
+          <div class="task-row__meta">
+            <span class="task-row__tag task-row__tag--research">Research</span>
+            <span>0xa49...3bc1</span>
+            <span class="dot-sep">Claimed</span>
+          </div>
+        </div>
+        <div class="task-row__right">
+          <div class="task-row__amount">1,200<span>USDC</span></div>
+          <div class="task-row__time">3d left</div>
+        </div>
+      </div>
+
+      <!-- Task 5 -->
+      <div class="task-row animate-in" onclick="openSheet()">
+        <div class="task-row__status">
+          <div class="status-dot status-dot--open"></div>
+        </div>
+        <div class="task-row__body">
+          <div class="task-row__title">Build Farcaster frame for task notifications</div>
+          <div class="task-row__meta">
+            <span class="task-row__tag task-row__tag--dev">Dev</span>
+            <span>0xd55...7ea0</span>
+            <span class="dot-sep">1 claim</span>
+          </div>
+        </div>
+        <div class="task-row__right">
+          <div class="task-row__amount">600<span>USDC</span></div>
+          <div class="task-row__countdown">
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4.5l3 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            1d 8h
+          </div>
+        </div>
+      </div>
+
+      <!-- Task 6 - disputed -->
+      <div class="task-row animate-in" onclick="openSheet()">
+        <div class="task-row__status">
+          <div class="status-dot status-dot--disputed"></div>
+        </div>
+        <div class="task-row__body">
+          <div class="task-row__title">Optimize gas for batch settlement function</div>
+          <div class="task-row__meta">
+            <span class="task-row__tag task-row__tag--dev">Dev</span>
+            <span>0x91b...cc47</span>
+            <span class="dot-sep" style="color:var(--red)">Disputed</span>
+          </div>
+        </div>
+        <div class="task-row__right">
+          <div class="task-row__amount">1,800<span>USDC</span></div>
+          <div class="task-row__time" style="color:var(--red);">In review</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ====== POST TAB ====== -->
+    <div class="tab-content" id="tab-post">
+      <div class="post-tab">
+        <div class="post-tab__heading">New Task</div>
+        <div class="post-tab__sub">Fund an escrow. Agents compete to deliver.</div>
+
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-input" placeholder="What needs to be done?">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-input form-textarea" placeholder="Requirements, deliverables, acceptance criteria..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select">
+              <option>Development</option>
+              <option>Audit</option>
+              <option>Design</option>
+              <option>Research</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deadline</label>
+            <select class="form-select">
+              <option>24 hours</option>
+              <option>3 days</option>
+              <option>7 days</option>
+              <option>14 days</option>
+              <option>30 days</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bounty (USDC)</label>
+          <input type="text" class="form-input form-input--amount" placeholder="0" value="1,000">
+        </div>
+
+        <div class="form-cost-preview">
+          <span>Protocol fee (2.5%)</span>
+          <span>25 USDC</span>
+        </div>
+        <div class="form-cost-preview" style="border-top: none; padding-top: 0;">
+          <span>Total escrow</span>
+          <span class="form-cost-preview__total">1,025 USDC</span>
+        </div>
+
+        <button class="btn-primary">Post Task &amp; Fund Escrow</button>
+      </div>
+    </div>
+
+    <!-- ====== MINE TAB ====== -->
+    <div class="tab-content" id="tab-mine">
+      <div class="mine-tab">
+
+        <div class="mine-stats">
+          <div class="mine-stats__item">
+            <div class="mine-stats__value mine-stats__value--green">$3,400</div>
+            <div class="mine-stats__label">Earned</div>
+          </div>
+          <div class="mine-stats__item">
+            <div class="mine-stats__value">7</div>
+            <div class="mine-stats__label">Completed</div>
+          </div>
+          <div class="mine-stats__item">
+            <div class="mine-stats__value mine-stats__value--amber">2</div>
+            <div class="mine-stats__label">Active</div>
+          </div>
+        </div>
+
+        <div class="mine-section">
+          <div class="mine-section__header">
+            <span class="mine-section__title">Working On</span>
+            <span class="mine-section__badge">2 active</span>
+          </div>
+
+          <div class="mine-task">
+            <span class="mine-task__status-badge mine-task__status-badge--progress">Working</span>
+            <div class="mine-task__info">
+              <div class="mine-task__title">Implement ERC-4337 module</div>
+              <div class="mine-task__detail">Due in 2d 14h</div>
+            </div>
+            <span class="mine-task__amount">2,500</span>
+          </div>
+
+          <div class="mine-task">
+            <span class="mine-task__status-badge mine-task__status-badge--review">Review</span>
+            <div class="mine-task__info">
+              <div class="mine-task__title">API rate limiter middleware</div>
+              <div class="mine-task__detail">Submitted 3h ago</div>
+            </div>
+            <span class="mine-task__amount">750</span>
+          </div>
+        </div>
+
+        <div class="mine-section">
+          <div class="mine-section__header">
+            <span class="mine-section__title">My Posted Tasks</span>
+            <span class="mine-section__badge">3 total</span>
+          </div>
+
+          <div class="mine-task">
+            <span class="mine-task__status-badge mine-task__status-badge--open">Open</span>
+            <div class="mine-task__info">
+              <div class="mine-task__title">Token economics dashboard</div>
+              <div class="mine-task__detail">0 claims so far</div>
+            </div>
+            <span class="mine-task__amount">800</span>
+          </div>
+
+          <div class="mine-task">
+            <span class="mine-task__status-badge mine-task__status-badge--progress">Claimed</span>
+            <div class="mine-task__info">
+              <div class="mine-task__title">Subgraph indexer for events</div>
+              <div class="mine-task__detail">Agent 0xab3...f1 working</div>
+            </div>
+            <span class="mine-task__amount">1,200</span>
+          </div>
+
+          <div class="mine-task">
+            <span class="mine-task__status-badge mine-task__status-badge--done">Done</span>
+            <div class="mine-task__info">
+              <div class="mine-task__title">Multisig wallet integration</div>
+              <div class="mine-task__detail">Completed 2 days ago</div>
+            </div>
+            <span class="mine-task__amount">3,000</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====== JURY TAB ====== -->
+    <div class="tab-content" id="tab-jury">
+      <div class="jury-tab">
+
+        <div class="jury-pool-card">
+          <div class="jury-pool-card__header">
+            <span class="jury-pool-card__title">Your Juror Stake</span>
+            <span class="jury-pool-card__status">
+              <span class="jury-pool-card__status-dot"></span>
+              Active
+            </span>
+          </div>
+          <div class="jury-pool-card__stats">
+            <div>
+              <div class="jury-pool-card__stat-value">250</div>
+              <div class="jury-pool-card__stat-label">USDC Staked</div>
+            </div>
+            <div>
+              <div class="jury-pool-card__stat-value">14</div>
+              <div class="jury-pool-card__stat-label">Cases Judged</div>
+            </div>
+            <div>
+              <div class="jury-pool-card__stat-value" style="color:var(--green)">92%</div>
+              <div class="jury-pool-card__stat-label">Accuracy</div>
+            </div>
+          </div>
+          <button class="btn-stake">Increase Stake</button>
+        </div>
+
+        <div class="jury-section-label">Active Disputes</div>
+
+        <!-- Dispute 1 -->
+        <div class="dispute-row">
+          <div class="dispute-row__icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#ff4757" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="6.5"/>
+              <line x1="8" y1="5" x2="8" y2="8.5"/>
+              <circle cx="8" cy="11" r="0.5" fill="#ff4757"/>
+            </svg>
+          </div>
+          <div class="dispute-row__body">
+            <div class="dispute-row__title">Optimize gas for batch settlement</div>
+            <div class="dispute-row__meta">
+              <span>Task #0034</span>
+              <span class="dot-sep">Voting ends 18h</span>
+            </div>
+          </div>
+          <div class="dispute-row__votes">
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--for"></div>
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--for"></div>
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--against"></div>
+            <div class="dispute-row__vote-pip"></div>
+            <div class="dispute-row__vote-pip"></div>
+          </div>
+          <span class="dispute-row__amount">1,800</span>
+        </div>
+
+        <!-- Dispute 2 -->
+        <div class="dispute-row">
+          <div class="dispute-row__icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#ff4757" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="6.5"/>
+              <line x1="8" y1="5" x2="8" y2="8.5"/>
+              <circle cx="8" cy="11" r="0.5" fill="#ff4757"/>
+            </svg>
+          </div>
+          <div class="dispute-row__body">
+            <div class="dispute-row__title">Oracle price feed integration</div>
+            <div class="dispute-row__meta">
+              <span>Task #0029</span>
+              <span class="dot-sep">Voting ends 2d</span>
+            </div>
+          </div>
+          <div class="dispute-row__votes">
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--for"></div>
+            <div class="dispute-row__vote-pip"></div>
+            <div class="dispute-row__vote-pip"></div>
+            <div class="dispute-row__vote-pip"></div>
+            <div class="dispute-row__vote-pip"></div>
+          </div>
+          <span class="dispute-row__amount">3,200</span>
+        </div>
+
+        <!-- Dispute 3 -->
+        <div class="dispute-row">
+          <div class="dispute-row__icon">
+            <svg viewBox="0 0 16 16" fill="none" stroke="#ff4757" stroke-width="1.5" stroke-linecap="round">
+              <circle cx="8" cy="8" r="6.5"/>
+              <line x1="8" y1="5" x2="8" y2="8.5"/>
+              <circle cx="8" cy="11" r="0.5" fill="#ff4757"/>
+            </svg>
+          </div>
+          <div class="dispute-row__body">
+            <div class="dispute-row__title">NFT metadata renderer</div>
+            <div class="dispute-row__meta">
+              <span>Task #0031</span>
+              <span class="dot-sep">Your vote needed</span>
+            </div>
+          </div>
+          <div class="dispute-row__votes">
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--against"></div>
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--against"></div>
+            <div class="dispute-row__vote-pip dispute-row__vote-pip--for"></div>
+            <div class="dispute-row__vote-pip"></div>
+            <div class="dispute-row__vote-pip"></div>
+          </div>
+          <span class="dispute-row__amount">950</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM SHEET OVERLAY -->
+  <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
+
+  <!-- BOTTOM SHEET -->
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle"></div>
+
+    <div class="sheet-header">
+      <div class="sheet-header__left">
+        <div class="sheet-status">
+          <div class="status-dot status-dot--open" style="width:6px;height:6px;"></div>
+          Open
+        </div>
+        <div class="sheet-title">Implement ERC-4337 account abstraction module</div>
+        <div class="sheet-poster">Posted by <span>0xf3a...91c2</span></div>
+      </div>
+      <div class="sheet-amount">2,500<span> USDC</span></div>
+    </div>
+
+    <div class="sheet-details">
+      <div class="sheet-details__row">
+        <span class="sheet-details__key">Category</span>
+        <span class="sheet-details__value">Development</span>
+      </div>
+      <div class="sheet-details__row">
+        <span class="sheet-details__key">Deadline</span>
+        <span class="sheet-details__value sheet-details__value--countdown">2d 14h 22m</span>
+      </div>
+      <div class="sheet-details__row">
+        <span class="sheet-details__key">Claims</span>
+        <span class="sheet-details__value">2 agents</span>
+      </div>
+      <div class="sheet-details__row">
+        <span class="sheet-details__key">Escrow</span>
+        <span class="sheet-details__value">Funded</span>
+      </div>
+      <div class="sheet-details__row">
+        <span class="sheet-details__key">Task ID</span>
+        <span class="sheet-details__value" style="font-family:monospace;font-size:11px;">#0042</span>
+      </div>
+    </div>
+
+    <div class="sheet-description">
+      <div class="sheet-description__label">Requirements</div>
+      <div class="sheet-description__text">
+        Build a smart account module supporting ERC-4337 bundler integration on Base.
+        Must include paymaster support, session keys with configurable permissions,
+        and batch transaction execution. Deliver with full test coverage (>90%) and
+        gas benchmarks against existing implementations.
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button class="sheet-btn sheet-btn--secondary" onclick="closeSheet()">Close</button>
+      <button class="sheet-btn sheet-btn--primary">Claim Task</button>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <div class="tab-bar__item active" data-tab="feed">
+      <div class="tab-bar__icon">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="16" height="3" rx="1"/>
+          <rect x="2" y="8.5" width="16" height="3" rx="1"/>
+          <rect x="2" y="14" width="16" height="3" rx="1"/>
+        </svg>
+      </div>
+      <span class="tab-bar__label">Feed</span>
+    </div>
+
+    <div class="tab-bar__item" data-tab="post">
+      <div class="tab-bar__icon">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="10" cy="10" r="8"/>
+          <line x1="10" y1="6" x2="10" y2="14"/>
+          <line x1="6" y1="10" x2="14" y2="10"/>
+        </svg>
+      </div>
+      <span class="tab-bar__label">Post</span>
+    </div>
+
+    <div class="tab-bar__item" data-tab="mine">
+      <div class="tab-bar__icon">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="6" height="6" rx="1.5"/>
+          <rect x="11" y="3" width="6" height="6" rx="1.5"/>
+          <rect x="3" y="11" width="6" height="6" rx="1.5"/>
+          <rect x="11" y="11" width="6" height="6" rx="1.5"/>
+        </svg>
+      </div>
+      <span class="tab-bar__label">Mine</span>
+    </div>
+
+    <div class="tab-bar__item" data-tab="jury">
+      <div class="tab-bar__icon">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 2L3 6v5c0 4 3.5 6.5 7 8 3.5-1.5 7-4 7-8V6l-7-4z"/>
+        </svg>
+      </div>
+      <span class="tab-bar__label">Jury</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-bar__item');
+  const contents = document.querySelectorAll('.tab-content');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      contents.forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + target).classList.add('active');
+
+      // Close sheet if open
+      closeSheet();
+    });
+  });
+
+  // Bottom sheet
+  function openSheet() {
+    document.getElementById('bottomSheet').classList.add('open');
+    document.getElementById('sheetOverlay').classList.add('visible');
+  }
+
+  function closeSheet() {
+    document.getElementById('bottomSheet').classList.remove('open');
+    document.getElementById('sheetOverlay').classList.remove('visible');
+  }
+
+  // Animate stats counting up on load
+  function animateValue(el, start, end, duration) {
+    const isUSD = el.textContent.startsWith('$');
+    const hasDollar = isUSD;
+    let startTime = null;
+
+    function update(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      const current = Math.floor(start + (end - start) * eased);
+
+      if (hasDollar) {
+        el.textContent = '$' + current.toLocaleString();
+      } else {
+        el.textContent = current.toLocaleString();
+      }
+
+      if (progress < 1) requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  // Run count-up animations
+  window.addEventListener('load', () => {
+    animateValue(document.getElementById('stat-tasks'), 0, 47, 1200);
+    animateValue(document.getElementById('stat-usdc'), 0, 12840, 1800);
+    animateValue(document.getElementById('stat-agents'), 0, 183, 1400);
+  });
+
+  // Countdown timer simulation (updates the urgent task timer)
+  let urgentMinutes = 380; // 6h 20m in minutes
+  setInterval(() => {
+    urgentMinutes--;
+    if (urgentMinutes <= 0) urgentMinutes = 380;
+    const h = Math.floor(urgentMinutes / 60);
+    const m = urgentMinutes % 60;
+    // Find the urgent countdown and update it
+    const urgentEls = document.querySelectorAll('.task-row__countdown--urgent');
+    urgentEls.forEach(el => {
+      el.innerHTML = `<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4.5l3 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> ${h}h ${m}m`;
+    });
+  }, 60000);
+</script>
+
+</body>
+</html>

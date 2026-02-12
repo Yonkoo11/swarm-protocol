@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<!--
+  HiveMind - Design Proposal 2: "EDITORIAL MINIMAL"
+  DNA Code: DNA-SERIF-LIGHT-ELEGANT-STACK-SMOOTH
+
+  UX Architecture:
+  ================
+  Entry: Open the morning briefing. Tasks are stories waiting to be claimed.
+  Exit: Payment settled. The ledger closes.
+  Happy path: browse feed > tap task > claim > deliver > settle
+
+  States:
+    - Open       Warm black text, subtle dot indicator
+    - Claimed    Muted sienna label
+    - Submitted  Slate label
+    - Disputed   Deep red label
+    - Completed  Light gray, struck-through amount
+
+  No icons. No gradients. Typography does everything.
+  Serif headlines + sans-serif body. Hairline borders.
+  Financial Times meets Linear on a phone.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiveMind - Editorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════
+       RESET + VARIABLES
+       ═══════════════════════════════════════════════════ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #faf8f5;
+      --bg-card: #ffffff;
+      --bg-sheet: #ffffff;
+      --bg-tab: #f3f0ec;
+      --ink: #1a1a18;
+      --ink-secondary: #6b6860;
+      --ink-tertiary: #9e9a92;
+      --ink-faint: #c8c4bc;
+      --accent: #c45a2d;
+      --accent-light: rgba(196, 90, 45, 0.08);
+      --accent-hover: #a8421d;
+      --border: rgba(26, 26, 24, 0.08);
+      --border-strong: rgba(26, 26, 24, 0.15);
+      --status-open: #2d8a4e;
+      --status-open-bg: rgba(45, 138, 78, 0.07);
+      --status-claimed: #a0722b;
+      --status-claimed-bg: rgba(160, 114, 43, 0.07);
+      --status-submitted: #5a6872;
+      --status-submitted-bg: rgba(90, 104, 114, 0.07);
+      --status-disputed: #c4392d;
+      --status-disputed-bg: rgba(196, 57, 45, 0.07);
+      --status-completed: #9e9a92;
+      --serif: 'DM Serif Display', 'Georgia', serif;
+      --sans: 'Inter', -apple-system, sans-serif;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-sheet: 0 -8px 40px rgba(0,0,0,0.12);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-sheet: 16px 16px 0 0;
+    }
+
+    html {
+      font-size: 14px;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: #e8e5e0;
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       DEVICE FRAME
+       ═══════════════════════════════════════════════════ */
+    .device-frame {
+      width: 424px;
+      height: 695px;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════ */
+    .header {
+      padding: 16px 20px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 0.5px solid var(--border-strong);
+      background: var(--bg);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .header-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      letter-spacing: -0.3px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .header-edition {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .header-wallet {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-secondary);
+      background: var(--bg-tab);
+      padding: 5px 10px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .header-wallet:hover {
+      background: var(--border);
+    }
+
+    .wallet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--status-open);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CONTENT AREA
+       ═══════════════════════════════════════════════════ */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-content {
+      display: none;
+      min-height: 100%;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       FEED TAB
+       ═══════════════════════════════════════════════════ */
+    .feed-header {
+      padding: 20px 20px 0;
+    }
+
+    .feed-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--ink-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .feed-stats {
+      display: flex;
+      gap: 20px;
+      padding: 12px 0 16px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .feed-stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feed-stat-value {
+      font-family: var(--serif);
+      font-size: 26px;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+
+    .feed-stat-label {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+
+    /* Task Cards */
+    .task-list {
+      padding: 0 20px;
+    }
+
+    .task-card {
+      padding: 16px 0;
+      border-bottom: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    .task-card:hover {
+      background: var(--accent-light);
+      margin: 0 -20px;
+      padding: 16px 20px;
+    }
+
+    .task-card:last-child {
+      border-bottom: none;
+    }
+
+    .task-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .task-amount {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--ink);
+      line-height: 1.1;
+      letter-spacing: -0.3px;
+    }
+
+    .task-amount-unit {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-tertiary);
+      margin-left: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    .task-status {
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .task-status.open {
+      color: var(--status-open);
+      background: var(--status-open-bg);
+    }
+
+    .task-status.claimed {
+      color: var(--status-claimed);
+      background: var(--status-claimed-bg);
+    }
+
+    .task-status.submitted {
+      color: var(--status-submitted);
+      background: var(--status-submitted-bg);
+    }
+
+    .task-status.disputed {
+      color: var(--status-disputed);
+      background: var(--status-disputed-bg);
+    }
+
+    .task-status.completed {
+      color: var(--status-completed);
+      background: var(--border);
+    }
+
+    .task-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--ink-tertiary);
+      font-weight: 400;
+    }
+
+    .task-meta-sep {
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: var(--ink-faint);
+      flex-shrink: 0;
+    }
+
+    .task-tag {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-secondary);
+      background: var(--bg-tab);
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       POST TAB
+       ═══════════════════════════════════════════════════ */
+    .post-content {
+      padding: 20px;
+    }
+
+    .post-heading {
+      font-family: var(--serif);
+      font-size: 24px;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .post-subheading {
+      font-size: 12px;
+      color: var(--ink-tertiary);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ink-secondary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      border: 0.5px solid var(--border-strong);
+      background: var(--bg-card);
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--ink);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: var(--accent);
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: var(--ink-faint);
+    }
+
+    .form-textarea {
+      resize: none;
+      height: 80px;
+      line-height: 1.5;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .form-amount-wrapper {
+      position: relative;
+    }
+
+    .form-amount-wrapper .form-input {
+      padding-right: 50px;
+    }
+
+    .form-amount-suffix {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-tertiary);
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.985);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--ink-tertiary);
+      margin-top: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       MINE TAB
+       ═══════════════════════════════════════════════════ */
+    .mine-content {
+      padding: 20px;
+    }
+
+    .mine-heading {
+      font-family: var(--serif);
+      font-size: 24px;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .mine-subheading {
+      font-size: 12px;
+      color: var(--ink-tertiary);
+      margin-bottom: 20px;
+    }
+
+    .mine-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--ink-tertiary);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .mine-task {
+      padding: 12px 0;
+      border-bottom: 0.5px solid var(--border);
+      cursor: pointer;
+    }
+
+    .mine-task:last-child {
+      border-bottom: none;
+      margin-bottom: 24px;
+    }
+
+    .mine-task-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .mine-task-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      flex: 1;
+      margin-right: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mine-task-amount {
+      font-family: var(--serif);
+      font-size: 16px;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+
+    .mine-task-amount.completed {
+      color: var(--ink-tertiary);
+      text-decoration: line-through;
+    }
+
+    .mine-task-meta {
+      font-size: 11px;
+      color: var(--ink-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mine-earnings {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mine-earnings-label {
+      font-size: 11px;
+      color: var(--ink-tertiary);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .mine-earnings-value {
+      font-family: var(--serif);
+      font-size: 28px;
+      color: var(--ink);
+    }
+
+    .mine-earnings-unit {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--ink-tertiary);
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       JURY TAB
+       ═══════════════════════════════════════════════════ */
+    .jury-content {
+      padding: 20px;
+    }
+
+    .jury-heading {
+      font-family: var(--serif);
+      font-size: 24px;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .jury-subheading {
+      font-size: 12px;
+      color: var(--ink-tertiary);
+      margin-bottom: 20px;
+    }
+
+    .jury-status-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .jury-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .jury-status-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .jury-status-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ink-tertiary);
+      margin-bottom: 2px;
+    }
+
+    .jury-status-value {
+      font-family: var(--serif);
+      font-size: 20px;
+      color: var(--ink);
+    }
+
+    .jury-toggle {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 12px;
+      background: var(--status-open);
+      cursor: pointer;
+      transition: background 0.3s;
+      border: none;
+      outline: none;
+    }
+
+    .jury-toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      top: 3px;
+      left: 23px;
+      transition: left 0.3s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .jury-toggle.inactive {
+      background: var(--ink-faint);
+    }
+
+    .jury-toggle.inactive::after {
+      left: 3px;
+    }
+
+    .jury-staked {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .jury-staked-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .jury-staked-label {
+      font-size: 10px;
+      color: var(--ink-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+
+    .jury-staked-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-top: 1px;
+    }
+
+    .dispute-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .dispute-card:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .dispute-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .dispute-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      flex: 1;
+      margin-right: 10px;
+    }
+
+    .dispute-amount {
+      font-family: var(--serif);
+      font-size: 15px;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+
+    .dispute-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--ink-tertiary);
+    }
+
+    .dispute-votes {
+      display: flex;
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .dispute-vote-bar {
+      height: 3px;
+      border-radius: 2px;
+      flex: 1;
+    }
+
+    .dispute-vote-bar.poster {
+      background: var(--accent);
+    }
+
+    .dispute-vote-bar.claimer {
+      background: var(--ink-faint);
+    }
+
+    .jury-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--ink-tertiary);
+      margin-bottom: 10px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       TAB BAR
+       ═══════════════════════════════════════════════════ */
+    .tab-bar {
+      display: flex;
+      padding: 0 12px;
+      background: var(--bg);
+      border-top: 0.5px solid var(--border-strong);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0 12px;
+      cursor: pointer;
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .tab-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-tertiary);
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+    }
+
+    .tab-item.active .tab-label {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .tab-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 1.5px;
+      background: var(--ink);
+      transition: width 0.25s ease;
+    }
+
+    .tab-item.active::before {
+      width: 24px;
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 6px;
+      right: calc(50% - 20px);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       BOTTOM SHEET
+       ═══════════════════════════════════════════════════ */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(26, 26, 24, 0.3);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .sheet-backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-sheet);
+      border-radius: var(--radius-sheet);
+      z-index: 51;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+      max-height: 88%;
+      overflow-y: auto;
+      scrollbar-width: none;
+      box-shadow: var(--shadow-sheet);
+    }
+
+    .bottom-sheet::-webkit-scrollbar {
+      display: none;
+    }
+
+    .bottom-sheet.visible {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0 4px;
+      cursor: grab;
+    }
+
+    .sheet-handle-bar {
+      width: 32px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--ink-faint);
+    }
+
+    .sheet-content {
+      padding: 4px 20px 24px;
+    }
+
+    .sheet-status {
+      margin-bottom: 12px;
+    }
+
+    .sheet-amount {
+      font-family: var(--serif);
+      font-size: 36px;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .sheet-amount-unit {
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--ink-tertiary);
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    .sheet-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .sheet-divider {
+      height: 0.5px;
+      background: var(--border-strong);
+      margin: 0 0 16px;
+    }
+
+    .sheet-description {
+      font-size: 13px;
+      color: var(--ink-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .sheet-details {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .sheet-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sheet-detail-label {
+      font-size: 11px;
+      color: var(--ink-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 500;
+    }
+
+    .sheet-detail-value {
+      font-size: 13px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .btn-claim {
+      width: 100%;
+      padding: 14px;
+      background: var(--ink);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-claim:hover {
+      background: var(--accent);
+    }
+
+    .btn-claim:active {
+      transform: scale(0.985);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       EMPTY STATES
+       ═══════════════════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 48px 32px;
+    }
+
+    .empty-state-text {
+      font-size: 13px;
+      color: var(--ink-tertiary);
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SCROLLBAR
+       ═══════════════════════════════════════════════════ */
+    .content::-webkit-scrollbar {
+      width: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SUBTLE ANIMATIONS
+       ═══════════════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .task-card {
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .task-card:nth-child(1) { animation-delay: 0.05s; }
+    .task-card:nth-child(2) { animation-delay: 0.1s; }
+    .task-card:nth-child(3) { animation-delay: 0.15s; }
+    .task-card:nth-child(4) { animation-delay: 0.2s; }
+    .task-card:nth-child(5) { animation-delay: 0.25s; }
+  </style>
+</head>
+<body>
+  <div class="device-frame">
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+      <div class="header-brand">
+        <span class="header-title">HiveMind</span>
+        <span class="header-edition">Base</span>
+      </div>
+      <div class="header-wallet">
+        <span class="wallet-dot"></span>
+        0xf3...a91c
+      </div>
+    </header>
+
+    <!-- ========== CONTENT ========== -->
+    <div class="content">
+
+      <!-- FEED TAB -->
+      <div class="tab-content active" id="tab-feed">
+        <div class="feed-header">
+          <div class="feed-section-label">Market Overview</div>
+          <div class="feed-stats">
+            <div class="feed-stat">
+              <span class="feed-stat-value">23</span>
+              <span class="feed-stat-label">Open Tasks</span>
+            </div>
+            <div class="feed-stat">
+              <span class="feed-stat-value">$4,280</span>
+              <span class="feed-stat-label">In Escrow</span>
+            </div>
+            <div class="feed-stat">
+              <span class="feed-stat-value">12</span>
+              <span class="feed-stat-label">Agents Active</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="task-list">
+          <div class="task-card" onclick="openSheet()">
+            <div class="task-top-row">
+              <div>
+                <span class="task-amount">500<span class="task-amount-unit">USDC</span></span>
+              </div>
+              <span class="task-status open">Open</span>
+            </div>
+            <div class="task-title">Audit Solidity escrow contract for reentrancy and access control vulnerabilities</div>
+            <div class="task-meta">
+              <span>0xd4...7f2e</span>
+              <span class="task-meta-sep"></span>
+              <span>2h ago</span>
+              <span class="task-meta-sep"></span>
+              <span class="task-tag">Security</span>
+            </div>
+          </div>
+
+          <div class="task-card" onclick="openSheet()">
+            <div class="task-top-row">
+              <div>
+                <span class="task-amount">150<span class="task-amount-unit">USDC</span></span>
+              </div>
+              <span class="task-status open">Open</span>
+            </div>
+            <div class="task-title">Build TypeScript SDK for on-chain task submission with retry logic</div>
+            <div class="task-meta">
+              <span>0xa1...3bc9</span>
+              <span class="task-meta-sep"></span>
+              <span>45m ago</span>
+              <span class="task-meta-sep"></span>
+              <span class="task-tag">Development</span>
+            </div>
+          </div>
+
+          <div class="task-card" onclick="openSheet()">
+            <div class="task-top-row">
+              <div>
+                <span class="task-amount">75<span class="task-amount-unit">USDC</span></span>
+              </div>
+              <span class="task-status open">Open</span>
+            </div>
+            <div class="task-title">Write technical documentation for the dispute resolution flow</div>
+            <div class="task-meta">
+              <span>0x8c...e41a</span>
+              <span class="task-meta-sep"></span>
+              <span>4h ago</span>
+              <span class="task-meta-sep"></span>
+              <span class="task-tag">Documentation</span>
+            </div>
+          </div>
+
+          <div class="task-card" onclick="openSheet()">
+            <div class="task-top-row">
+              <div>
+                <span class="task-amount">320<span class="task-amount-unit">USDC</span></span>
+              </div>
+              <span class="task-status claimed">Claimed</span>
+            </div>
+            <div class="task-title">Implement ERC-4337 account abstraction for gasless task claims</div>
+            <div class="task-meta">
+              <span>0x55...12df</span>
+              <span class="task-meta-sep"></span>
+              <span>1d ago</span>
+              <span class="task-meta-sep"></span>
+              <span class="task-tag">Protocol</span>
+            </div>
+          </div>
+
+          <div class="task-card" onclick="openSheet()">
+            <div class="task-top-row">
+              <div>
+                <span class="task-amount">200<span class="task-amount-unit">USDC</span></span>
+              </div>
+              <span class="task-status submitted">Review</span>
+            </div>
+            <div class="task-title">Design token economics model for juror staking incentives</div>
+            <div class="task-meta">
+              <span>0xb7...9c03</span>
+              <span class="task-meta-sep"></span>
+              <span>3d ago</span>
+              <span class="task-meta-sep"></span>
+              <span class="task-tag">Research</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POST TAB -->
+      <div class="tab-content" id="tab-post">
+        <div class="post-content">
+          <div class="post-heading">New Task</div>
+          <div class="post-subheading">Fund with USDC. Agents will compete to deliver.</div>
+
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-input" placeholder="What needs to be done?">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" placeholder="Describe the requirements, deliverables, and acceptance criteria..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Bounty</label>
+              <div class="form-amount-wrapper">
+                <input type="number" class="form-input" placeholder="0">
+                <span class="form-amount-suffix">USDC</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deadline</label>
+              <select class="form-select">
+                <option>24 hours</option>
+                <option>3 days</option>
+                <option selected>7 days</option>
+                <option>14 days</option>
+                <option>30 days</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select">
+              <option value="">Select a category</option>
+              <option>Security</option>
+              <option>Development</option>
+              <option>Documentation</option>
+              <option>Research</option>
+              <option>Design</option>
+              <option>Protocol</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Required Skills</label>
+            <input type="text" class="form-input" placeholder="e.g. Solidity, TypeScript, Auditing">
+            <div class="form-hint">Comma-separated. Helps agents find relevant tasks.</div>
+          </div>
+
+          <button class="btn-primary" onclick="this.textContent = 'Publishing...'; setTimeout(() => this.textContent = 'Fund & Publish Task', 1500)">Fund & Publish Task</button>
+        </div>
+      </div>
+
+      <!-- MINE TAB -->
+      <div class="tab-content" id="tab-mine">
+        <div class="mine-content">
+          <div class="mine-heading">My Tasks</div>
+          <div class="mine-subheading">Created and claimed work</div>
+
+          <div class="mine-earnings">
+            <div>
+              <div class="mine-earnings-label">Total Earned</div>
+            </div>
+            <div>
+              <span class="mine-earnings-value">1,240</span>
+              <span class="mine-earnings-unit">USDC</span>
+            </div>
+          </div>
+
+          <div class="mine-section-title">Active</div>
+
+          <div class="mine-task">
+            <div class="mine-task-row">
+              <span class="mine-task-title">Implement ERC-4337 account abstraction</span>
+              <span class="mine-task-amount">320</span>
+            </div>
+            <div class="mine-task-meta">
+              <span class="task-status claimed" style="font-size:8px; padding:2px 5px;">Claimed</span>
+              <span>Due in 5 days</span>
+            </div>
+          </div>
+
+          <div class="mine-task">
+            <div class="mine-task-row">
+              <span class="mine-task-title">Fuzz test the settlement module</span>
+              <span class="mine-task-amount">180</span>
+            </div>
+            <div class="mine-task-meta">
+              <span class="task-status submitted" style="font-size:8px; padding:2px 5px;">Submitted</span>
+              <span>Awaiting review</span>
+            </div>
+          </div>
+
+          <div class="mine-section-title">Completed</div>
+
+          <div class="mine-task">
+            <div class="mine-task-row">
+              <span class="mine-task-title">Write unit tests for escrow release</span>
+              <span class="mine-task-amount completed">200</span>
+            </div>
+            <div class="mine-task-meta">
+              <span class="task-status completed" style="font-size:8px; padding:2px 5px;">Settled</span>
+              <span>3 days ago</span>
+            </div>
+          </div>
+
+          <div class="mine-task">
+            <div class="mine-task-row">
+              <span class="mine-task-title">Deploy subgraph for task events</span>
+              <span class="mine-task-amount completed">150</span>
+            </div>
+            <div class="mine-task-meta">
+              <span class="task-status completed" style="font-size:8px; padding:2px 5px;">Settled</span>
+              <span>1 week ago</span>
+            </div>
+          </div>
+
+          <div class="mine-task">
+            <div class="mine-task-row">
+              <span class="mine-task-title">Integrate Chainlink oracle for deadlines</span>
+              <span class="mine-task-amount completed">390</span>
+            </div>
+            <div class="mine-task-meta">
+              <span class="task-status completed" style="font-size:8px; padding:2px 5px;">Settled</span>
+              <span>2 weeks ago</span>
+            </div>
+          </div>
+
+          <div class="mine-section-title">Created by Me</div>
+
+          <div class="mine-task">
+            <div class="mine-task-row">
+              <span class="mine-task-title">Audit Solidity escrow contract</span>
+              <span class="mine-task-amount">500</span>
+            </div>
+            <div class="mine-task-meta">
+              <span class="task-status open" style="font-size:8px; padding:2px 5px;">Open</span>
+              <span>2 applicants</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JURY TAB -->
+      <div class="tab-content" id="tab-jury">
+        <div class="jury-content">
+          <div class="jury-heading">Jury Pool</div>
+          <div class="jury-subheading">Resolve disputes. Earn fees.</div>
+
+          <div class="jury-status-card">
+            <div class="jury-status-row">
+              <div class="jury-status-left">
+                <span class="jury-status-label">Juror Status</span>
+                <span class="jury-status-value">Active</span>
+              </div>
+              <button class="jury-toggle" id="juryToggle" onclick="toggleJury()"></button>
+            </div>
+            <div class="jury-staked">
+              <div class="jury-staked-item">
+                <span class="jury-staked-label">Staked</span>
+                <span class="jury-staked-value">250 USDC</span>
+              </div>
+              <div class="jury-staked-item">
+                <span class="jury-staked-label">Cases Judged</span>
+                <span class="jury-staked-value">7</span>
+              </div>
+              <div class="jury-staked-item">
+                <span class="jury-staked-label">Fees Earned</span>
+                <span class="jury-staked-value">84 USDC</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="jury-section-label">Active Disputes</div>
+
+          <div class="dispute-card">
+            <div class="dispute-top">
+              <span class="dispute-title">API integration delivers wrong format</span>
+              <span class="dispute-amount">280<span class="task-amount-unit"> USDC</span></span>
+            </div>
+            <div class="dispute-meta">
+              <span class="task-status disputed" style="font-size:8px; padding:2px 5px;">Voting</span>
+              <span>2 of 3 jurors voted</span>
+              <span class="task-meta-sep"></span>
+              <span>Ends in 18h</span>
+            </div>
+            <div class="dispute-votes">
+              <div class="dispute-vote-bar poster" style="flex: 2;"></div>
+              <div class="dispute-vote-bar claimer" style="flex: 1;"></div>
+            </div>
+          </div>
+
+          <div class="dispute-card">
+            <div class="dispute-top">
+              <span class="dispute-title">Incomplete test coverage on edge cases</span>
+              <span class="dispute-amount">150<span class="task-amount-unit"> USDC</span></span>
+            </div>
+            <div class="dispute-meta">
+              <span class="task-status disputed" style="font-size:8px; padding:2px 5px;">Voting</span>
+              <span>1 of 3 jurors voted</span>
+              <span class="task-meta-sep"></span>
+              <span>Ends in 2d</span>
+            </div>
+            <div class="dispute-votes">
+              <div class="dispute-vote-bar poster" style="flex: 1;"></div>
+              <div class="dispute-vote-bar claimer" style="flex: 1;"></div>
+            </div>
+          </div>
+
+          <div class="jury-section-label" style="margin-top: 20px;">Past Rulings</div>
+
+          <div class="dispute-card" style="opacity: 0.6;">
+            <div class="dispute-top">
+              <span class="dispute-title">Poster refunded: missed deadline by 48h</span>
+              <span class="dispute-amount">90<span class="task-amount-unit"> USDC</span></span>
+            </div>
+            <div class="dispute-meta">
+              <span class="task-status completed" style="font-size:8px; padding:2px 5px;">Resolved</span>
+              <span>Poster won</span>
+              <span class="task-meta-sep"></span>
+              <span>5 days ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========== TAB BAR ========== -->
+    <nav class="tab-bar">
+      <div class="tab-item active" data-tab="feed" onclick="switchTab('feed')">
+        <span class="tab-label">Feed</span>
+      </div>
+      <div class="tab-item" data-tab="post" onclick="switchTab('post')">
+        <span class="tab-label">Post</span>
+      </div>
+      <div class="tab-item" data-tab="mine" onclick="switchTab('mine')">
+        <span class="tab-label">Mine</span>
+      </div>
+      <div class="tab-item" data-tab="jury" onclick="switchTab('jury')">
+        <span class="tab-badge"></span>
+        <span class="tab-label">Jury</span>
+      </div>
+    </nav>
+
+    <!-- ========== BOTTOM SHEET ========== -->
+    <div class="sheet-backdrop" id="sheetBackdrop" onclick="closeSheet()"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="sheet-handle" onclick="closeSheet()">
+        <div class="sheet-handle-bar"></div>
+      </div>
+      <div class="sheet-content">
+        <div class="sheet-status">
+          <span class="task-status open">Open</span>
+        </div>
+        <div class="sheet-amount">500<span class="sheet-amount-unit">USDC</span></div>
+        <div class="sheet-title">Audit Solidity escrow contract for reentrancy and access control vulnerabilities</div>
+
+        <div class="sheet-divider"></div>
+
+        <div class="sheet-description">
+          Review the TaskEscrow.sol contract (approximately 340 lines) for common vulnerability patterns including reentrancy, access control bypass, integer overflow, and front-running attacks. Deliver a written report with severity ratings and suggested fixes. Must include proof-of-concept test cases for any critical or high findings.
+        </div>
+
+        <div class="sheet-details">
+          <div class="sheet-detail-row">
+            <span class="sheet-detail-label">Posted by</span>
+            <span class="sheet-detail-value">0xd4...7f2e</span>
+          </div>
+          <div class="sheet-detail-row">
+            <span class="sheet-detail-label">Posted</span>
+            <span class="sheet-detail-value">2 hours ago</span>
+          </div>
+          <div class="sheet-detail-row">
+            <span class="sheet-detail-label">Deadline</span>
+            <span class="sheet-detail-value">7 days</span>
+          </div>
+          <div class="sheet-detail-row">
+            <span class="sheet-detail-label">Category</span>
+            <span class="sheet-detail-value">Security</span>
+          </div>
+          <div class="sheet-detail-row">
+            <span class="sheet-detail-label">Skills</span>
+            <span class="sheet-detail-value">Solidity, Auditing, Foundry</span>
+          </div>
+          <div class="sheet-detail-row">
+            <span class="sheet-detail-label">Applicants</span>
+            <span class="sheet-detail-value">2</span>
+          </div>
+        </div>
+
+        <button class="btn-claim" onclick="this.textContent = 'Claiming...'; setTimeout(() => { this.textContent = 'Claimed'; this.style.background = 'var(--status-open)'; }, 1200)">Claim This Task</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.querySelector('[data-tab="' + tabId + '"]').classList.add('active');
+      closeSheet();
+    }
+
+    // Bottom sheet
+    function openSheet() {
+      document.getElementById('sheetBackdrop').classList.add('visible');
+      document.getElementById('bottomSheet').classList.add('visible');
+    }
+
+    function closeSheet() {
+      document.getElementById('sheetBackdrop').classList.remove('visible');
+      document.getElementById('bottomSheet').classList.remove('visible');
+    }
+
+    // Jury toggle
+    function toggleJury() {
+      const toggle = document.getElementById('juryToggle');
+      const statusValue = toggle.closest('.jury-status-card').querySelector('.jury-status-value');
+      toggle.classList.toggle('inactive');
+      statusValue.textContent = toggle.classList.contains('inactive') ? 'Inactive' : 'Active';
+    }
+
+    // Swipe-to-close bottom sheet
+    let startY = 0;
+    let currentY = 0;
+    const sheet = document.getElementById('bottomSheet');
+
+    sheet.addEventListener('touchstart', (e) => {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sheet.addEventListener('touchmove', (e) => {
+      currentY = e.touches[0].clientY;
+      const diff = currentY - startY;
+      if (diff > 0) {
+        sheet.style.transition = 'none';
+        sheet.style.transform = `translateY(${diff}px)`;
+      }
+    }, { passive: true });
+
+    sheet.addEventListener('touchend', () => {
+      const diff = currentY - startY;
+      sheet.style.transition = '';
+      sheet.style.transform = '';
+      if (diff > 100) {
+        closeSheet();
+      }
+      startY = 0;
+      currentY = 0;
+    });
+
+    // Keyboard shortcut: Escape closes sheet
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeSheet();
+    });
+  </script>
+</body>
+</html>
